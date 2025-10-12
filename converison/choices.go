@@ -1,8 +1,8 @@
 package converison
 
 import (
-	pb "github.com/henrylamb/object-generation-golang/grpc"
-	"github.com/henrylamb/object-generation-golang/jsonSchema"
+	pb "github.com/firechimp-org/go-sdk/grpc"
+	"github.com/firechimp-org/go-sdk/jsonSchema"
 )
 
 // ConvertProtoToChoices converts a protobuf Choices to the Go model Choices

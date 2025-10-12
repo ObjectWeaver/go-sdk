@@ -1,8 +1,8 @@
 package converison
 
 import (
-	pb "github.com/henrylamb/object-generation-golang/grpc"
-	"github.com/henrylamb/object-generation-golang/jsonSchema"
+	pb "github.com/firechimp-org/go-sdk/grpc"
+	"github.com/firechimp-org/go-sdk/jsonSchema"
 )
 
 // ConvertProtoToModel converts a protobuf Definition to your Go model Definition
@@ -16,7 +16,7 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		Instruction:        protoDef.Instruction,
 		Properties:         make(map[string]jsonSchema.Definition),
 		Items:              ConvertProtoToModel(protoDef.GetItems()), // Use Getters to handle nil cases
-		Model:              jsonSchema.ModelType(protoDef.Model),
+		Model:              protoDef.Model,
 		ProcessingOrder:    protoDef.ProcessingOrder,
 		SystemPrompt:       getStringPointer(protoDef.GetSystemPrompt()), // Safe getter for pointers
 		ImprovementProcess: protoDef.ImprovementProcess,
@@ -66,7 +66,7 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		Instruction:        modelDef.Instruction,
 		Properties:         make(map[string]*pb.Definition),
 		Items:              ConvertModelToProto(modelDef.Items),
-		Model:              string(modelDef.Model),
+		Model:              modelDef.Model,
 		ProcessingOrder:    modelDef.ProcessingOrder,
 		SystemPrompt:       systemPrompt,
 		ImprovementProcess: modelDef.ImprovementProcess,

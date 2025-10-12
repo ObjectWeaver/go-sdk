@@ -1,0 +1,36 @@
+{
+  "threshold": "A-",
+  "security": {
+    "owasp": false,
+    "cweTop25": false
+  },
+  "quality": {
+    "solid": true,
+    "cleanCode": false,
+    "prReady": false,
+    "complexity": true,
+    "solidPro": false,
+    "cleanCodePro": false,
+    "complexityPro": false,
+    "testability": false
+  },
+  "safetyCritical": {
+    "misraCpp": false
+  },
+  "testing": {
+    "functionalCoverage": false
+  },
+  "codeReviewType": {
+    "pro": true
+  },
+  "qualitySentry": {
+    "tdd": false
+  },
+  "testGeneration": {
+    "active": false,
+    "override": false,
+    "language": "Golang",
+    "testType": "Unit",
+    "library": "Ginkgo"
+  }
+}

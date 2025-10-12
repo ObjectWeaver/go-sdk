@@ -1,20 +1,16 @@
-# Object Generation Golang
-  
-<p align="center">
-  <img src="https://i.postimg.cc/K8TjGy01/3-BD4-B9-DD-B0-B4-4033-B561-50-B5-CB6-A37-B0.jpg" alt="Alt text" width="200"/>
-</p>
+# Firechimp Go SDK
 
 This module provides a client implementation for sending JSON definitions via HTTP POST requests. It is designed to be simple and easy to integrate into your existing Go projects.
 
 ## Installation
 
-```go get github.com/henrylamb/object-generation-golang```
+```go get github.com/firechimp-org/go-sdk```
 
 To use this library you will need to import it in the below format:
 
 ```go
 import (
-"github.com/henrylamb/object-generation-golang/jsonSchema"
+"github.com/firechimp-org/go-sdk/jsonSchema"
 )
 
 ```

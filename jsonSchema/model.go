@@ -12,8 +12,8 @@ type Definition struct {
 
 	// Items specifies which data type an array contains, if the schema type is Array.
 	Items *Definition `json:"items,omitempty"`
-	// Model
-	Model ModelType `json:"model,omitempty"`
+	// Model this needs to match the exact name of the model that you will be sending to AI as a Service provider. Such as OpenAI or Google Gemini
+	Model string `json:"model,omitempty"`
 	// ProcessingOrder this is the order of strings ie the fields of the parent property keys that need to be processed first before this field is processed
 	ProcessingOrder []string `json:"processingOrder,omitempty"`
 

@@ -1,4 +1,4 @@
-module github.com/henrylamb/object-generation-golang
+module github.com/firechimp-org/go-sdk
 
 go 1.22
 

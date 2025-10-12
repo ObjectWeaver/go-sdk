@@ -3,7 +3,7 @@ package client
 import (
 	"net/http"
 
-	"github.com/henrylamb/object-generation-golang/jsonSchema"
+	"github.com/firechimp-org/go-sdk/jsonSchema"
 )
 
 // Client responsible for holding base configuration and dependencies

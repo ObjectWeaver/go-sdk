@@ -3,8 +3,8 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/henrylamb/object-generation-golang/converison"
-	pb "github.com/henrylamb/object-generation-golang/grpc"
+	"github.com/firechimp-org/go-sdk/converison"
+	pb "github.com/firechimp-org/go-sdk/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"time"

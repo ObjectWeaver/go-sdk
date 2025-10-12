@@ -1,8 +1,8 @@
 package converison
 
 import (
-	pb "github.com/henrylamb/object-generation-golang/grpc"
-	"github.com/henrylamb/object-generation-golang/jsonSchema"
+	pb "github.com/firechimp-org/go-sdk/grpc"
+	"github.com/firechimp-org/go-sdk/jsonSchema"
 )
 
 // ConvertProtoToHashMap converts a protobuf HashMap to the Go model HashMap

@@ -1,6 +1,6 @@
 package client
 
-import "github.com/henrylamb/object-generation-golang/jsonSchema"
+import "github.com/firechimp-org/go-sdk/jsonSchema"
 
 type RequestBody struct {
 	Prompt     string                 `json:"prompt"`

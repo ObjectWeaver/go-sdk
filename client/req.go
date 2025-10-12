@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/henrylamb/object-generation-golang/jsonSchema"
+	"github.com/firechimp-org/go-sdk/jsonSchema"
 	"log"
 	"net/http"
 )
