@@ -1,8 +1,8 @@
 package converison
 
 import (
-	pb "github.com/firechimp-org/go-sdk/grpc"
-	"github.com/firechimp-org/go-sdk/jsonSchema"
+	pb "github.com/objectweaver/go-sdk/grpc"
+	"github.com/objectweaver/go-sdk/jsonSchema"
 )
 
 // ConvertProtoToFocus converts a protobuf Focus to the Go model Focus

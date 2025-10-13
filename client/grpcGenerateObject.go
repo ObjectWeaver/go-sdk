@@ -3,11 +3,12 @@ package client
 import (
 	"context"
 	"fmt"
-	"github.com/firechimp-org/go-sdk/converison"
-	pb "github.com/firechimp-org/go-sdk/grpc"
+	"time"
+
+	"github.com/objectweaver/go-sdk/converison"
+	pb "github.com/objectweaver/go-sdk/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"time"
 )
 
 // SendRequestToServer sends a request to the gRPC server with authorization headers

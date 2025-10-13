@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/firechimp-org/go-sdk/jsonSchema"
 	"log"
 	"net/http"
+
+	"github.com/objectweaver/go-sdk/jsonSchema"
 )
 
 // ExecuteRequest executes an HTTP request based on the RequestFormat

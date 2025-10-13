@@ -1,16 +1,16 @@
-# Firechimp Go SDK
+# ObjectWeaver Go SDK
 
 This module provides a client implementation for sending JSON definitions via HTTP POST requests. It is designed to be simple and easy to integrate into your existing Go projects.
 
 ## Installation
 
-```go get github.com/firechimp-org/go-sdk```
+```go get github.com/objectweaver/go-sdk```
 
 To use this library you will need to import it in the below format:
 
 ```go
 import (
-"github.com/firechimp-org/go-sdk/jsonSchema"
+"github.com/objectweaver/go-sdk/jsonSchema"
 )
 
 ```
