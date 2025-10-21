@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.20.3
-// source: object-generation.proto
+// source: objectweaver.proto
 
 package grpc
 
@@ -167,5 +167,5 @@ var JSONSchemaService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "object-generation.proto",
+	Metadata: "objectweaver.proto",
 }

@@ -60,6 +60,9 @@ type Definition struct {
 
 	//OverridePrompt - used for overriding the prompt that is passed in
 	OverridePrompt *string `json:"overridePrompt,omitempty"`
+
+	//Priority - used for setting the priority of the request
+	Priority int32 `json:"priority,omitempty"`
 }
 
 type Choices struct {
@@ -100,3 +103,10 @@ type RequestFormat struct {
 	Authorization string                 `json:"authorization,omitempty"`
 	RequireFields []string               `json:"requirFields,omitempty"`
 }
+
+const (
+	UrgentPriority   = int32(2)  //the highest priority and will take precedence over all other requests
+	StandardPriority = int32(1)  //standard priority for most requests
+	LowPriority      = int32(0)  //low priority requests
+	EventualPriority = int32(-1) //for batch LLM usage
+)

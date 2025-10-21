@@ -29,6 +29,7 @@ message Definition {
   SendImage sendImage = 18; // Corresponds to Go's SendImage field
   bool stream = 19;
   float temp = 20;
+  int32 priority = 21;
 }
 
 // Audio message

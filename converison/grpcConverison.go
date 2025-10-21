@@ -30,6 +30,8 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		TextToSpeech:       convertProtoTextToSpeech(protoDef.GetTextToSpeech()),
 		SendImage:          convertProtoSendImage(protoDef.GetSendImage()), // Handle nil structs
 		Stream:             protoDef.Stream,
+		Temp:               float64(protoDef.Temp),
+		Priority:           protoDef.Priority,
 	}
 
 	// Handle Properties map
@@ -81,6 +83,8 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		TextToSpeech:       convertModelTextToSpeech(modelDef.TextToSpeech),
 		SendImage:          convertModelSendImage(modelDef.SendImage),
 		Stream:             modelDef.Stream,
+		Temp:               float32(modelDef.Temp),
+		Priority:           modelDef.Priority,
 	}
 
 	// Handle Properties map
