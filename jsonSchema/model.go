@@ -143,10 +143,6 @@ type DecisionPoint struct {
 	// If multiple branches could match, prioritize them using the Priority field.
 	Branches []ConditionalBranch `json:"branches"`
 
-	// Default fallback Definition if no branch conditions match.
-	// If nil and no branches match, processing continues without branching.
-	Default *Definition `json:"default,omitempty"`
-
 	// Strategy determines how conditions are evaluated:
 	// - RouteByScore: Use LLM evaluation scores from ScoringCriteria
 	// - RouteByField: Use values from SelectFields
@@ -164,6 +160,9 @@ type ConditionalBranch struct {
 	// Example: [{field: "accuracy", operator: "gt", value: 70}, {field: "readability", operator: "lt", value: 80}]
 	// This creates: "if accuracy > 70 AND readability < 80"
 	Conditions []Condition `json:"conditions"`
+
+	//This is the definition logic which will be the prompts and instructions on how to evualate the generated content/prior stages of the LLM
+	Logic *Definition `json:"logic"`
 
 	// Then is the Definition to generate if all conditions match.
 	// This Definition can have its own DecisionPoint, enabling nested decision trees.
@@ -304,28 +303,22 @@ const (
 // The field will be generated multiple times, with each iteration potentially improving on the last.
 // Useful for high-quality content that benefits from multiple attempts and selection of the best result.
 type RecursiveLoop struct {
-	// MaxIterations limits the number of generation attempts.
-	// Prevents infinite loops and controls costs. Processing stops after this many iterations
-	// regardless of whether termination conditions are met.
-	MaxIterations int `json:"maxIterations"`
+    // MaxIterations limits the number of generation attempts.
+    MaxIterations int `json:"maxIterations"`
 
-	// Selection determines which iteration to keep as the final result.
-	// Options: highest (best score), lowest (worst score), latest (most recent), first (first successful)
-	Selection SelectionStrategy `json:"selection"`
+    // Selection determines which iteration to keep as the final result.
+    Selection SelectionStrategy `json:"selection"`
 
-	// TerminateWhen defines conditions that stop iteration early if met.
-	// Example: Stop when quality_score >= 85, even if under MaxIterations.
-	// If empty, always runs until MaxIterations is reached.
-	TerminateWhen []TerminationCondition `json:"terminateWhen,omitempty"`
+    // TerminationPoint uses DecisionPoint logic to determine when to stop early.
+    // If any branch matches, iteration stops. Use branch priority to control evaluation order.
+    // Example: Stop when quality >= 85 OR when all dimensions > 70
+    TerminationPoint *DecisionPoint `json:"terminationPoint,omitempty"`
 
-	// FeedbackPrompt guides improvement between iterations.
-	// This prompt is shown to the LLM along with the previous attempt to guide refinement.
-	// Example: "Improve the following content by addressing these weaknesses: {previous_scores}"
-	FeedbackPrompt string `json:"feedbackPrompt,omitempty"`
+    // FeedbackPrompt guides improvement between iterations.
+    FeedbackPrompt string `json:"feedbackPrompt,omitempty"`
 
-	// IncludePreviousAttempts determines whether to show the LLM all previous iterations
-	// or just the most recent one. Useful for learning from multiple attempts.
-	IncludePreviousAttempts bool `json:"includePreviousAttempts,omitempty"`
+    // IncludePreviousAttempts determines whether to show the LLM all previous iterations
+    IncludePreviousAttempts bool `json:"includePreviousAttempts,omitempty"`
 }
 
 // SelectionStrategy determines which iteration to keep from a RecursiveLoop.
@@ -353,21 +346,3 @@ const (
 	SelectAll SelectionStrategy = "all"
 )
 
-// TerminationCondition defines when to stop a RecursiveLoop early.
-// If any termination condition is met, iteration stops even if under MaxIterations.
-type TerminationCondition struct {
-	// Field is the name of the score to check (from ScoringCriteria dimensions).
-	Field string `json:"field"`
-
-	// Operator defines the comparison to perform.
-	// Example: "gte" for "greater than or equal to"
-	Operator ComparisonOperator `json:"operator"`
-
-	// Value is the threshold that triggers termination.
-	// Example: 85 to stop when score >= 85
-	Value interface{} `json:"value"`
-
-	// StopOn determines whether to stop when condition is true or false.
-	// Default (true) stops when condition matches. Set to false to stop when condition fails.
-	StopOn bool `json:"stopOn,omitempty"`
-}

@@ -72,11 +72,6 @@ func ExampleSimpleScoreBasedRouting() Definition {
 							},
 						},
 					},
-					Default: &Definition{
-						Type:         String,
-						Instruction:  "Perform general improvements to both accuracy and readability",
-						SelectFields: []string{"content"},
-					},
 				},
 			},
 		},
@@ -266,12 +261,21 @@ func ExampleRecursiveLoop() Definition {
 		RecursiveLoop: &RecursiveLoop{
 			MaxIterations: 5,
 			Selection:     SelectHighestScore,
-			TerminateWhen: []TerminationCondition{
-				{
-					Field:    "persuasiveness",
-					Operator: OpGreaterThanOrEqual,
-					Value:    85, // Stop early if persuasiveness >= 85
-					StopOn:   true,
+			TerminationPoint: &DecisionPoint{
+				Name:     "EarlyTermination",
+				Strategy: RouteByScore,
+				Branches: []ConditionalBranch{
+					{
+						Name: "HighQuality",
+						Conditions: []Condition{
+							{Field: "persuasiveness", Operator: OpGreaterThanOrEqual, Value: 85},
+						},
+						Then: Definition{
+							Type:         String,
+							Instruction:  "Stop iteration, high quality achieved",
+							SelectFields: []string{"description"},
+						},
+					},
 				},
 			},
 			FeedbackPrompt:          "Improve the product description by making it more compelling and benefit-focused",
