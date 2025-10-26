@@ -116,8 +116,12 @@ message ConditionalBranch {
 message Condition {
   string field = 1;
   string operator = 2; // ComparisonOperator as string
-  google.protobuf.Struct value = 3; // Dynamic value
-  string fieldPath = 4;
+  oneof value {
+    double number_value = 3;
+    string string_value = 4;
+    bool bool_value = 5;
+  }
+  string fieldPath = 6;
 }
 
 // ScoringCriteria message

@@ -1,9 +1,10 @@
 package converison
 
 import (
+	"fmt"
+	
 	pb "github.com/objectweaver/go-sdk/grpc"
 	"github.com/objectweaver/go-sdk/jsonSchema"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // ConvertProtoToModel converts a protobuf Definition to your Go model Definition
@@ -238,8 +239,14 @@ func convertProtoCondition(c *pb.Condition) *jsonSchema.Condition {
 	}
 
 	var value interface{}
-	if c.Value != nil {
-		value = c.Value.AsMap()
+	// Handle oneof value field
+	switch v := c.Value.(type) {
+	case *pb.Condition_NumberValue:
+		value = v.NumberValue
+	case *pb.Condition_StringValue:
+		value = v.StringValue
+	case *pb.Condition_BoolValue:
+		value = v.BoolValue
 	}
 
 	return &jsonSchema.Condition{
@@ -349,24 +356,36 @@ func convertModelCondition(c *jsonSchema.Condition) *pb.Condition {
 		return nil
 	}
 
-	// Convert interface{} to protobuf Struct
-	var valueStruct *structpb.Struct
+	condition := &pb.Condition{
+		Field:     c.Field,
+		Operator:  string(c.Operator),
+		FieldPath: c.FieldPath,
+	}
+
+	// Set the appropriate oneof field based on the value type
 	if c.Value != nil {
-		// Try to convert to map first
-		if valueMap, ok := c.Value.(map[string]interface{}); ok {
-			valueStruct, _ = structpb.NewStruct(valueMap)
-		} else {
-			// Wrap primitive values in a map
-			valueStruct, _ = structpb.NewStruct(map[string]interface{}{"value": c.Value})
+		switch v := c.Value.(type) {
+		case float64:
+			condition.Value = &pb.Condition_NumberValue{NumberValue: v}
+		case float32:
+			condition.Value = &pb.Condition_NumberValue{NumberValue: float64(v)}
+		case int:
+			condition.Value = &pb.Condition_NumberValue{NumberValue: float64(v)}
+		case int32:
+			condition.Value = &pb.Condition_NumberValue{NumberValue: float64(v)}
+		case int64:
+			condition.Value = &pb.Condition_NumberValue{NumberValue: float64(v)}
+		case string:
+			condition.Value = &pb.Condition_StringValue{StringValue: v}
+		case bool:
+			condition.Value = &pb.Condition_BoolValue{BoolValue: v}
+		default:
+			// For other types, try to convert to string as fallback
+			condition.Value = &pb.Condition_StringValue{StringValue: fmt.Sprintf("%v", v)}
 		}
 	}
 
-	return &pb.Condition{
-		Field:     c.Field,
-		Operator:  string(c.Operator),
-		Value:     valueStruct,
-		FieldPath: c.FieldPath,
-	}
+	return condition
 }
 
 func convertModelScoringCriteria(sc *jsonSchema.ScoringCriteria) *pb.ScoringCriteria {

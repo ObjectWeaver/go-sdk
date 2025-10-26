@@ -912,11 +912,16 @@ func (x *ConditionalBranch) GetPriority() int32 {
 
 // Condition message
 type Condition struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Field         string                 `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
-	Operator      string                 `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty"` // ComparisonOperator as string
-	Value         *structpb.Struct       `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`       // Dynamic value
-	FieldPath     string                 `protobuf:"bytes,4,opt,name=fieldPath,proto3" json:"fieldPath,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Field    string                 `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	Operator string                 `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty"` // ComparisonOperator as string
+	// Types that are valid to be assigned to Value:
+	//
+	//	*Condition_NumberValue
+	//	*Condition_StringValue
+	//	*Condition_BoolValue
+	Value         isCondition_Value `protobuf_oneof:"value"`
+	FieldPath     string            `protobuf:"bytes,6,opt,name=fieldPath,proto3" json:"fieldPath,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -965,11 +970,38 @@ func (x *Condition) GetOperator() string {
 	return ""
 }
 
-func (x *Condition) GetValue() *structpb.Struct {
+func (x *Condition) GetValue() isCondition_Value {
 	if x != nil {
 		return x.Value
 	}
 	return nil
+}
+
+func (x *Condition) GetNumberValue() float64 {
+	if x != nil {
+		if x, ok := x.Value.(*Condition_NumberValue); ok {
+			return x.NumberValue
+		}
+	}
+	return 0
+}
+
+func (x *Condition) GetStringValue() string {
+	if x != nil {
+		if x, ok := x.Value.(*Condition_StringValue); ok {
+			return x.StringValue
+		}
+	}
+	return ""
+}
+
+func (x *Condition) GetBoolValue() bool {
+	if x != nil {
+		if x, ok := x.Value.(*Condition_BoolValue); ok {
+			return x.BoolValue
+		}
+	}
+	return false
 }
 
 func (x *Condition) GetFieldPath() string {
@@ -978,6 +1010,28 @@ func (x *Condition) GetFieldPath() string {
 	}
 	return ""
 }
+
+type isCondition_Value interface {
+	isCondition_Value()
+}
+
+type Condition_NumberValue struct {
+	NumberValue float64 `protobuf:"fixed64,3,opt,name=number_value,json=numberValue,proto3,oneof"`
+}
+
+type Condition_StringValue struct {
+	StringValue string `protobuf:"bytes,4,opt,name=string_value,json=stringValue,proto3,oneof"`
+}
+
+type Condition_BoolValue struct {
+	BoolValue bool `protobuf:"varint,5,opt,name=bool_value,json=boolValue,proto3,oneof"`
+}
+
+func (*Condition_NumberValue) isCondition_Value() {}
+
+func (*Condition_StringValue) isCondition_Value() {}
+
+func (*Condition_BoolValue) isCondition_Value() {}
 
 // ScoringCriteria message
 type ScoringCriteria struct {
@@ -1498,12 +1552,16 @@ const file_objectweaver_proto_rawDesc = "" +
 	"conditions\x12,\n" +
 	"\x05logic\x18\x03 \x01(\v2\x16.jsonSchema.DefinitionR\x05logic\x12*\n" +
 	"\x04then\x18\x04 \x01(\v2\x16.jsonSchema.DefinitionR\x04then\x12\x1a\n" +
-	"\bpriority\x18\x05 \x01(\x05R\bpriority\"\x8a\x01\n" +
+	"\bpriority\x18\x05 \x01(\x05R\bpriority\"\xcf\x01\n" +
 	"\tCondition\x12\x14\n" +
 	"\x05field\x18\x01 \x01(\tR\x05field\x12\x1a\n" +
-	"\boperator\x18\x02 \x01(\tR\boperator\x12-\n" +
-	"\x05value\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x05value\x12\x1c\n" +
-	"\tfieldPath\x18\x04 \x01(\tR\tfieldPath\"\x93\x02\n" +
+	"\boperator\x18\x02 \x01(\tR\boperator\x12#\n" +
+	"\fnumber_value\x18\x03 \x01(\x01H\x00R\vnumberValue\x12#\n" +
+	"\fstring_value\x18\x04 \x01(\tH\x00R\vstringValue\x12\x1f\n" +
+	"\n" +
+	"bool_value\x18\x05 \x01(\bH\x00R\tboolValue\x12\x1c\n" +
+	"\tfieldPath\x18\x06 \x01(\tR\tfieldPathB\a\n" +
+	"\x05value\"\x93\x02\n" +
 	"\x0fScoringCriteria\x12K\n" +
 	"\n" +
 	"dimensions\x18\x01 \x03(\v2+.jsonSchema.ScoringCriteria.DimensionsEntryR\n" +
@@ -1603,30 +1661,34 @@ var file_objectweaver_proto_depIdxs = []int32{
 	11, // 17: jsonSchema.ConditionalBranch.conditions:type_name -> jsonSchema.Condition
 	0,  // 18: jsonSchema.ConditionalBranch.logic:type_name -> jsonSchema.Definition
 	0,  // 19: jsonSchema.ConditionalBranch.then:type_name -> jsonSchema.Definition
-	22, // 20: jsonSchema.Condition.value:type_name -> google.protobuf.Struct
-	21, // 21: jsonSchema.ScoringCriteria.dimensions:type_name -> jsonSchema.ScoringCriteria.DimensionsEntry
-	14, // 22: jsonSchema.ScoringDimension.scale:type_name -> jsonSchema.ScoreScale
-	9,  // 23: jsonSchema.RecursiveLoop.terminationPoint:type_name -> jsonSchema.DecisionPoint
-	0,  // 24: jsonSchema.RequestBody.definition:type_name -> jsonSchema.Definition
-	22, // 25: jsonSchema.Response.data:type_name -> google.protobuf.Struct
-	22, // 26: jsonSchema.StreamingResponse.data:type_name -> google.protobuf.Struct
-	0,  // 27: jsonSchema.Definition.PropertiesEntry.value:type_name -> jsonSchema.Definition
-	13, // 28: jsonSchema.ScoringCriteria.DimensionsEntry.value:type_name -> jsonSchema.ScoringDimension
-	16, // 29: jsonSchema.JSONSchemaService.GenerateObject:input_type -> jsonSchema.RequestBody
-	16, // 30: jsonSchema.JSONSchemaService.StreamGeneratedObjects:input_type -> jsonSchema.RequestBody
-	17, // 31: jsonSchema.JSONSchemaService.GenerateObject:output_type -> jsonSchema.Response
-	18, // 32: jsonSchema.JSONSchemaService.StreamGeneratedObjects:output_type -> jsonSchema.StreamingResponse
-	31, // [31:33] is the sub-list for method output_type
-	29, // [29:31] is the sub-list for method input_type
-	29, // [29:29] is the sub-list for extension type_name
-	29, // [29:29] is the sub-list for extension extendee
-	0,  // [0:29] is the sub-list for field type_name
+	21, // 20: jsonSchema.ScoringCriteria.dimensions:type_name -> jsonSchema.ScoringCriteria.DimensionsEntry
+	14, // 21: jsonSchema.ScoringDimension.scale:type_name -> jsonSchema.ScoreScale
+	9,  // 22: jsonSchema.RecursiveLoop.terminationPoint:type_name -> jsonSchema.DecisionPoint
+	0,  // 23: jsonSchema.RequestBody.definition:type_name -> jsonSchema.Definition
+	22, // 24: jsonSchema.Response.data:type_name -> google.protobuf.Struct
+	22, // 25: jsonSchema.StreamingResponse.data:type_name -> google.protobuf.Struct
+	0,  // 26: jsonSchema.Definition.PropertiesEntry.value:type_name -> jsonSchema.Definition
+	13, // 27: jsonSchema.ScoringCriteria.DimensionsEntry.value:type_name -> jsonSchema.ScoringDimension
+	16, // 28: jsonSchema.JSONSchemaService.GenerateObject:input_type -> jsonSchema.RequestBody
+	16, // 29: jsonSchema.JSONSchemaService.StreamGeneratedObjects:input_type -> jsonSchema.RequestBody
+	17, // 30: jsonSchema.JSONSchemaService.GenerateObject:output_type -> jsonSchema.Response
+	18, // 31: jsonSchema.JSONSchemaService.StreamGeneratedObjects:output_type -> jsonSchema.StreamingResponse
+	30, // [30:32] is the sub-list for method output_type
+	28, // [28:30] is the sub-list for method input_type
+	28, // [28:28] is the sub-list for extension type_name
+	28, // [28:28] is the sub-list for extension extendee
+	0,  // [0:28] is the sub-list for field type_name
 }
 
 func init() { file_objectweaver_proto_init() }
 func file_objectweaver_proto_init() {
 	if File_objectweaver_proto != nil {
 		return
+	}
+	file_objectweaver_proto_msgTypes[11].OneofWrappers = []any{
+		(*Condition_NumberValue)(nil),
+		(*Condition_StringValue)(nil),
+		(*Condition_BoolValue)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
