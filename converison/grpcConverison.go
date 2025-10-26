@@ -3,6 +3,7 @@ package converison
 import (
 	pb "github.com/objectweaver/go-sdk/grpc"
 	"github.com/objectweaver/go-sdk/jsonSchema"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // ConvertProtoToModel converts a protobuf Definition to your Go model Definition
@@ -32,6 +33,10 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		Stream:             protoDef.Stream,
 		Temp:               float64(protoDef.Temp),
 		Priority:           protoDef.Priority,
+		OverridePrompt:     getStringPointer(protoDef.GetOverridePrompt()),
+		DecisionPoint:      convertProtoDecisionPoint(protoDef.GetDecisionPoint()),
+		ScoringCriteria:    convertProtoScoringCriteria(protoDef.GetScoringCriteria()),
+		RecursiveLoop:      convertProtoRecursiveLoop(protoDef.GetRecursiveLoop()),
 	}
 
 	// Handle Properties map
@@ -63,6 +68,11 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		systemPrompt = *modelDef.SystemPrompt
 	}
 
+	overridePrompt := ""
+	if modelDef.OverridePrompt != nil {
+		overridePrompt = *modelDef.OverridePrompt
+	}
+
 	protoDef := &pb.Definition{
 		Type:               string(modelDef.Type),
 		Instruction:        modelDef.Instruction,
@@ -85,6 +95,10 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		Stream:             modelDef.Stream,
 		Temp:               float32(modelDef.Temp),
 		Priority:           modelDef.Priority,
+		OverridePrompt:     overridePrompt,
+		DecisionPoint:      convertModelDecisionPoint(modelDef.DecisionPoint),
+		ScoringCriteria:    convertModelScoringCriteria(modelDef.ScoringCriteria),
+		RecursiveLoop:      convertModelRecursiveLoop(modelDef.RecursiveLoop),
 	}
 
 	// Handle Properties map
@@ -176,5 +190,236 @@ func convertModelImage(image *jsonSchema.Image) *pb.Image {
 	return &pb.Image{
 		Model: string(image.Model),
 		Size:  string(image.Size),
+	}
+}
+
+// Helper functions for DecisionPoint, ScoringCriteria, and RecursiveLoop
+
+func convertProtoDecisionPoint(dp *pb.DecisionPoint) *jsonSchema.DecisionPoint {
+	if dp == nil {
+		return nil
+	}
+
+	branches := make([]jsonSchema.ConditionalBranch, len(dp.Branches))
+	for i, branch := range dp.Branches {
+		branches[i] = *convertProtoConditionalBranch(branch)
+	}
+
+	return &jsonSchema.DecisionPoint{
+		Name:             dp.Name,
+		EvaluationPrompt: dp.EvaluationPrompt,
+		Branches:         branches,
+		Strategy:         jsonSchema.RoutingStrategy(dp.Strategy),
+	}
+}
+
+func convertProtoConditionalBranch(cb *pb.ConditionalBranch) *jsonSchema.ConditionalBranch {
+	if cb == nil {
+		return nil
+	}
+
+	conditions := make([]jsonSchema.Condition, len(cb.Conditions))
+	for i, cond := range cb.Conditions {
+		conditions[i] = *convertProtoCondition(cond)
+	}
+
+	return &jsonSchema.ConditionalBranch{
+		Name:       cb.Name,
+		Conditions: conditions,
+		Logic:      ConvertProtoToModel(cb.Logic),
+		Then:       *ConvertProtoToModel(cb.Then),
+		Priority:   int(cb.Priority),
+	}
+}
+
+func convertProtoCondition(c *pb.Condition) *jsonSchema.Condition {
+	if c == nil {
+		return nil
+	}
+
+	var value interface{}
+	if c.Value != nil {
+		value = c.Value.AsMap()
+	}
+
+	return &jsonSchema.Condition{
+		Field:     c.Field,
+		Operator:  jsonSchema.ComparisonOperator(c.Operator),
+		Value:     value,
+		FieldPath: c.FieldPath,
+	}
+}
+
+func convertProtoScoringCriteria(sc *pb.ScoringCriteria) *jsonSchema.ScoringCriteria {
+	if sc == nil {
+		return nil
+	}
+
+	dimensions := make(map[string]jsonSchema.ScoringDimension)
+	for key, dim := range sc.Dimensions {
+		dimensions[key] = *convertProtoScoringDimension(dim)
+	}
+
+	return &jsonSchema.ScoringCriteria{
+		Dimensions:        dimensions,
+		EvaluationModel:   sc.EvaluationModel,
+		AggregationMethod: jsonSchema.AggregationMethod(sc.AggregationMethod),
+	}
+}
+
+func convertProtoScoringDimension(sd *pb.ScoringDimension) *jsonSchema.ScoringDimension {
+	if sd == nil {
+		return nil
+	}
+
+	return &jsonSchema.ScoringDimension{
+		Description: sd.Description,
+		Scale:       convertProtoScoreScale(sd.Scale),
+		Type:        jsonSchema.ScoreType(sd.Type),
+		Weight:      sd.Weight,
+	}
+}
+
+func convertProtoScoreScale(ss *pb.ScoreScale) *jsonSchema.ScoreScale {
+	if ss == nil {
+		return nil
+	}
+
+	return &jsonSchema.ScoreScale{
+		Min: int(ss.Min),
+		Max: int(ss.Max),
+	}
+}
+
+func convertProtoRecursiveLoop(rl *pb.RecursiveLoop) *jsonSchema.RecursiveLoop {
+	if rl == nil {
+		return nil
+	}
+
+	return &jsonSchema.RecursiveLoop{
+		MaxIterations:           int(rl.MaxIterations),
+		Selection:               jsonSchema.SelectionStrategy(rl.Selection),
+		TerminationPoint:        convertProtoDecisionPoint(rl.TerminationPoint),
+		FeedbackPrompt:          rl.FeedbackPrompt,
+		IncludePreviousAttempts: rl.IncludePreviousAttempts,
+	}
+}
+
+// Model to Proto conversions
+
+func convertModelDecisionPoint(dp *jsonSchema.DecisionPoint) *pb.DecisionPoint {
+	if dp == nil {
+		return nil
+	}
+
+	branches := make([]*pb.ConditionalBranch, len(dp.Branches))
+	for i, branch := range dp.Branches {
+		branches[i] = convertModelConditionalBranch(&branch)
+	}
+
+	return &pb.DecisionPoint{
+		Name:             dp.Name,
+		EvaluationPrompt: dp.EvaluationPrompt,
+		Branches:         branches,
+		Strategy:         string(dp.Strategy),
+	}
+}
+
+func convertModelConditionalBranch(cb *jsonSchema.ConditionalBranch) *pb.ConditionalBranch {
+	if cb == nil {
+		return nil
+	}
+
+	conditions := make([]*pb.Condition, len(cb.Conditions))
+	for i, cond := range cb.Conditions {
+		conditions[i] = convertModelCondition(&cond)
+	}
+
+	return &pb.ConditionalBranch{
+		Name:       cb.Name,
+		Conditions: conditions,
+		Logic:      ConvertModelToProto(cb.Logic),
+		Then:       ConvertModelToProto(&cb.Then),
+		Priority:   int32(cb.Priority),
+	}
+}
+
+func convertModelCondition(c *jsonSchema.Condition) *pb.Condition {
+	if c == nil {
+		return nil
+	}
+
+	// Convert interface{} to protobuf Struct
+	var valueStruct *structpb.Struct
+	if c.Value != nil {
+		// Try to convert to map first
+		if valueMap, ok := c.Value.(map[string]interface{}); ok {
+			valueStruct, _ = structpb.NewStruct(valueMap)
+		} else {
+			// Wrap primitive values in a map
+			valueStruct, _ = structpb.NewStruct(map[string]interface{}{"value": c.Value})
+		}
+	}
+
+	return &pb.Condition{
+		Field:     c.Field,
+		Operator:  string(c.Operator),
+		Value:     valueStruct,
+		FieldPath: c.FieldPath,
+	}
+}
+
+func convertModelScoringCriteria(sc *jsonSchema.ScoringCriteria) *pb.ScoringCriteria {
+	if sc == nil {
+		return nil
+	}
+
+	dimensions := make(map[string]*pb.ScoringDimension)
+	for key, dim := range sc.Dimensions {
+		dimensions[key] = convertModelScoringDimension(&dim)
+	}
+
+	return &pb.ScoringCriteria{
+		Dimensions:        dimensions,
+		EvaluationModel:   sc.EvaluationModel,
+		AggregationMethod: string(sc.AggregationMethod),
+	}
+}
+
+func convertModelScoringDimension(sd *jsonSchema.ScoringDimension) *pb.ScoringDimension {
+	if sd == nil {
+		return nil
+	}
+
+	return &pb.ScoringDimension{
+		Description: sd.Description,
+		Scale:       convertModelScoreScale(sd.Scale),
+		Type:        string(sd.Type),
+		Weight:      sd.Weight,
+	}
+}
+
+func convertModelScoreScale(ss *jsonSchema.ScoreScale) *pb.ScoreScale {
+	if ss == nil {
+		return nil
+	}
+
+	return &pb.ScoreScale{
+		Min: int32(ss.Min),
+		Max: int32(ss.Max),
+	}
+}
+
+func convertModelRecursiveLoop(rl *jsonSchema.RecursiveLoop) *pb.RecursiveLoop {
+	if rl == nil {
+		return nil
+	}
+
+	return &pb.RecursiveLoop{
+		MaxIterations:           int32(rl.MaxIterations),
+		Selection:               string(rl.Selection),
+		TerminationPoint:        convertModelDecisionPoint(rl.TerminationPoint),
+		FeedbackPrompt:          rl.FeedbackPrompt,
+		IncludePreviousAttempts: rl.IncludePreviousAttempts,
 	}
 }

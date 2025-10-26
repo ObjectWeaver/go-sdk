@@ -47,6 +47,10 @@ type Definition struct {
 	Stream             bool                   `protobuf:"varint,19,opt,name=stream,proto3" json:"stream,omitempty"`
 	Temp               float32                `protobuf:"fixed32,20,opt,name=temp,proto3" json:"temp,omitempty"`
 	Priority           int32                  `protobuf:"varint,21,opt,name=priority,proto3" json:"priority,omitempty"`
+	OverridePrompt     string                 `protobuf:"bytes,22,opt,name=overridePrompt,proto3" json:"overridePrompt,omitempty"`   // Corresponds to Go's OverridePrompt field
+	DecisionPoint      *DecisionPoint         `protobuf:"bytes,23,opt,name=decisionPoint,proto3" json:"decisionPoint,omitempty"`     // Corresponds to Go's DecisionPoint field
+	ScoringCriteria    *ScoringCriteria       `protobuf:"bytes,24,opt,name=scoringCriteria,proto3" json:"scoringCriteria,omitempty"` // Corresponds to Go's ScoringCriteria field
+	RecursiveLoop      *RecursiveLoop         `protobuf:"bytes,25,opt,name=recursiveLoop,proto3" json:"recursiveLoop,omitempty"`     // Corresponds to Go's RecursiveLoop field
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -226,6 +230,34 @@ func (x *Definition) GetPriority() int32 {
 		return x.Priority
 	}
 	return 0
+}
+
+func (x *Definition) GetOverridePrompt() string {
+	if x != nil {
+		return x.OverridePrompt
+	}
+	return ""
+}
+
+func (x *Definition) GetDecisionPoint() *DecisionPoint {
+	if x != nil {
+		return x.DecisionPoint
+	}
+	return nil
+}
+
+func (x *Definition) GetScoringCriteria() *ScoringCriteria {
+	if x != nil {
+		return x.ScoringCriteria
+	}
+	return nil
+}
+
+func (x *Definition) GetRecursiveLoop() *RecursiveLoop {
+	if x != nil {
+		return x.RecursiveLoop
+	}
+	return nil
 }
 
 // Audio message
@@ -732,6 +764,481 @@ func (x *RequestFormat) GetRequireFields() []string {
 	return nil
 }
 
+// DecisionPoint message
+type DecisionPoint struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Name             string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	EvaluationPrompt string                 `protobuf:"bytes,2,opt,name=evaluationPrompt,proto3" json:"evaluationPrompt,omitempty"`
+	Branches         []*ConditionalBranch   `protobuf:"bytes,3,rep,name=branches,proto3" json:"branches,omitempty"`
+	Strategy         string                 `protobuf:"bytes,4,opt,name=strategy,proto3" json:"strategy,omitempty"` // RoutingStrategy as string
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *DecisionPoint) Reset() {
+	*x = DecisionPoint{}
+	mi := &file_objectweaver_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DecisionPoint) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DecisionPoint) ProtoMessage() {}
+
+func (x *DecisionPoint) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DecisionPoint.ProtoReflect.Descriptor instead.
+func (*DecisionPoint) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *DecisionPoint) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *DecisionPoint) GetEvaluationPrompt() string {
+	if x != nil {
+		return x.EvaluationPrompt
+	}
+	return ""
+}
+
+func (x *DecisionPoint) GetBranches() []*ConditionalBranch {
+	if x != nil {
+		return x.Branches
+	}
+	return nil
+}
+
+func (x *DecisionPoint) GetStrategy() string {
+	if x != nil {
+		return x.Strategy
+	}
+	return ""
+}
+
+// ConditionalBranch message
+type ConditionalBranch struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Conditions    []*Condition           `protobuf:"bytes,2,rep,name=conditions,proto3" json:"conditions,omitempty"`
+	Logic         *Definition            `protobuf:"bytes,3,opt,name=logic,proto3" json:"logic,omitempty"`
+	Then          *Definition            `protobuf:"bytes,4,opt,name=then,proto3" json:"then,omitempty"`
+	Priority      int32                  `protobuf:"varint,5,opt,name=priority,proto3" json:"priority,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConditionalBranch) Reset() {
+	*x = ConditionalBranch{}
+	mi := &file_objectweaver_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConditionalBranch) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConditionalBranch) ProtoMessage() {}
+
+func (x *ConditionalBranch) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConditionalBranch.ProtoReflect.Descriptor instead.
+func (*ConditionalBranch) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *ConditionalBranch) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConditionalBranch) GetConditions() []*Condition {
+	if x != nil {
+		return x.Conditions
+	}
+	return nil
+}
+
+func (x *ConditionalBranch) GetLogic() *Definition {
+	if x != nil {
+		return x.Logic
+	}
+	return nil
+}
+
+func (x *ConditionalBranch) GetThen() *Definition {
+	if x != nil {
+		return x.Then
+	}
+	return nil
+}
+
+func (x *ConditionalBranch) GetPriority() int32 {
+	if x != nil {
+		return x.Priority
+	}
+	return 0
+}
+
+// Condition message
+type Condition struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Field         string                 `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	Operator      string                 `protobuf:"bytes,2,opt,name=operator,proto3" json:"operator,omitempty"` // ComparisonOperator as string
+	Value         *structpb.Struct       `protobuf:"bytes,3,opt,name=value,proto3" json:"value,omitempty"`       // Dynamic value
+	FieldPath     string                 `protobuf:"bytes,4,opt,name=fieldPath,proto3" json:"fieldPath,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Condition) Reset() {
+	*x = Condition{}
+	mi := &file_objectweaver_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Condition) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Condition) ProtoMessage() {}
+
+func (x *Condition) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Condition.ProtoReflect.Descriptor instead.
+func (*Condition) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *Condition) GetField() string {
+	if x != nil {
+		return x.Field
+	}
+	return ""
+}
+
+func (x *Condition) GetOperator() string {
+	if x != nil {
+		return x.Operator
+	}
+	return ""
+}
+
+func (x *Condition) GetValue() *structpb.Struct {
+	if x != nil {
+		return x.Value
+	}
+	return nil
+}
+
+func (x *Condition) GetFieldPath() string {
+	if x != nil {
+		return x.FieldPath
+	}
+	return ""
+}
+
+// ScoringCriteria message
+type ScoringCriteria struct {
+	state             protoimpl.MessageState       `protogen:"open.v1"`
+	Dimensions        map[string]*ScoringDimension `protobuf:"bytes,1,rep,name=dimensions,proto3" json:"dimensions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	EvaluationModel   string                       `protobuf:"bytes,2,opt,name=evaluationModel,proto3" json:"evaluationModel,omitempty"`
+	AggregationMethod string                       `protobuf:"bytes,3,opt,name=aggregationMethod,proto3" json:"aggregationMethod,omitempty"` // AggregationMethod as string
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *ScoringCriteria) Reset() {
+	*x = ScoringCriteria{}
+	mi := &file_objectweaver_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScoringCriteria) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScoringCriteria) ProtoMessage() {}
+
+func (x *ScoringCriteria) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScoringCriteria.ProtoReflect.Descriptor instead.
+func (*ScoringCriteria) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ScoringCriteria) GetDimensions() map[string]*ScoringDimension {
+	if x != nil {
+		return x.Dimensions
+	}
+	return nil
+}
+
+func (x *ScoringCriteria) GetEvaluationModel() string {
+	if x != nil {
+		return x.EvaluationModel
+	}
+	return ""
+}
+
+func (x *ScoringCriteria) GetAggregationMethod() string {
+	if x != nil {
+		return x.AggregationMethod
+	}
+	return ""
+}
+
+// ScoringDimension message
+type ScoringDimension struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Description   string                 `protobuf:"bytes,1,opt,name=description,proto3" json:"description,omitempty"`
+	Scale         *ScoreScale            `protobuf:"bytes,2,opt,name=scale,proto3" json:"scale,omitempty"`
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"` // ScoreType as string
+	Weight        float64                `protobuf:"fixed64,4,opt,name=weight,proto3" json:"weight,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ScoringDimension) Reset() {
+	*x = ScoringDimension{}
+	mi := &file_objectweaver_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScoringDimension) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScoringDimension) ProtoMessage() {}
+
+func (x *ScoringDimension) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScoringDimension.ProtoReflect.Descriptor instead.
+func (*ScoringDimension) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *ScoringDimension) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ScoringDimension) GetScale() *ScoreScale {
+	if x != nil {
+		return x.Scale
+	}
+	return nil
+}
+
+func (x *ScoringDimension) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *ScoringDimension) GetWeight() float64 {
+	if x != nil {
+		return x.Weight
+	}
+	return 0
+}
+
+// ScoreScale message
+type ScoreScale struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Min           int32                  `protobuf:"varint,1,opt,name=min,proto3" json:"min,omitempty"`
+	Max           int32                  `protobuf:"varint,2,opt,name=max,proto3" json:"max,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ScoreScale) Reset() {
+	*x = ScoreScale{}
+	mi := &file_objectweaver_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ScoreScale) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ScoreScale) ProtoMessage() {}
+
+func (x *ScoreScale) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ScoreScale.ProtoReflect.Descriptor instead.
+func (*ScoreScale) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ScoreScale) GetMin() int32 {
+	if x != nil {
+		return x.Min
+	}
+	return 0
+}
+
+func (x *ScoreScale) GetMax() int32 {
+	if x != nil {
+		return x.Max
+	}
+	return 0
+}
+
+// RecursiveLoop message
+type RecursiveLoop struct {
+	state                   protoimpl.MessageState `protogen:"open.v1"`
+	MaxIterations           int32                  `protobuf:"varint,1,opt,name=maxIterations,proto3" json:"maxIterations,omitempty"`
+	Selection               string                 `protobuf:"bytes,2,opt,name=selection,proto3" json:"selection,omitempty"` // SelectionStrategy as string
+	TerminationPoint        *DecisionPoint         `protobuf:"bytes,3,opt,name=terminationPoint,proto3" json:"terminationPoint,omitempty"`
+	FeedbackPrompt          string                 `protobuf:"bytes,4,opt,name=feedbackPrompt,proto3" json:"feedbackPrompt,omitempty"`
+	IncludePreviousAttempts bool                   `protobuf:"varint,5,opt,name=includePreviousAttempts,proto3" json:"includePreviousAttempts,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
+}
+
+func (x *RecursiveLoop) Reset() {
+	*x = RecursiveLoop{}
+	mi := &file_objectweaver_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RecursiveLoop) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RecursiveLoop) ProtoMessage() {}
+
+func (x *RecursiveLoop) ProtoReflect() protoreflect.Message {
+	mi := &file_objectweaver_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RecursiveLoop.ProtoReflect.Descriptor instead.
+func (*RecursiveLoop) Descriptor() ([]byte, []int) {
+	return file_objectweaver_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *RecursiveLoop) GetMaxIterations() int32 {
+	if x != nil {
+		return x.MaxIterations
+	}
+	return 0
+}
+
+func (x *RecursiveLoop) GetSelection() string {
+	if x != nil {
+		return x.Selection
+	}
+	return ""
+}
+
+func (x *RecursiveLoop) GetTerminationPoint() *DecisionPoint {
+	if x != nil {
+		return x.TerminationPoint
+	}
+	return nil
+}
+
+func (x *RecursiveLoop) GetFeedbackPrompt() string {
+	if x != nil {
+		return x.FeedbackPrompt
+	}
+	return ""
+}
+
+func (x *RecursiveLoop) GetIncludePreviousAttempts() bool {
+	if x != nil {
+		return x.IncludePreviousAttempts
+	}
+	return false
+}
+
 // RequestBody message for the GenerateObject RPC
 type RequestBody struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -743,7 +1250,7 @@ type RequestBody struct {
 
 func (x *RequestBody) Reset() {
 	*x = RequestBody{}
-	mi := &file_objectweaver_proto_msgTypes[9]
+	mi := &file_objectweaver_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -755,7 +1262,7 @@ func (x *RequestBody) String() string {
 func (*RequestBody) ProtoMessage() {}
 
 func (x *RequestBody) ProtoReflect() protoreflect.Message {
-	mi := &file_objectweaver_proto_msgTypes[9]
+	mi := &file_objectweaver_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -768,7 +1275,7 @@ func (x *RequestBody) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RequestBody.ProtoReflect.Descriptor instead.
 func (*RequestBody) Descriptor() ([]byte, []int) {
-	return file_objectweaver_proto_rawDescGZIP(), []int{9}
+	return file_objectweaver_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *RequestBody) GetPrompt() string {
@@ -796,7 +1303,7 @@ type Response struct {
 
 func (x *Response) Reset() {
 	*x = Response{}
-	mi := &file_objectweaver_proto_msgTypes[10]
+	mi := &file_objectweaver_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -808,7 +1315,7 @@ func (x *Response) String() string {
 func (*Response) ProtoMessage() {}
 
 func (x *Response) ProtoReflect() protoreflect.Message {
-	mi := &file_objectweaver_proto_msgTypes[10]
+	mi := &file_objectweaver_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -821,7 +1328,7 @@ func (x *Response) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Response.ProtoReflect.Descriptor instead.
 func (*Response) Descriptor() ([]byte, []int) {
-	return file_objectweaver_proto_rawDescGZIP(), []int{10}
+	return file_objectweaver_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *Response) GetData() *structpb.Struct {
@@ -850,7 +1357,7 @@ type StreamingResponse struct {
 
 func (x *StreamingResponse) Reset() {
 	*x = StreamingResponse{}
-	mi := &file_objectweaver_proto_msgTypes[11]
+	mi := &file_objectweaver_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -862,7 +1369,7 @@ func (x *StreamingResponse) String() string {
 func (*StreamingResponse) ProtoMessage() {}
 
 func (x *StreamingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_objectweaver_proto_msgTypes[11]
+	mi := &file_objectweaver_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -875,7 +1382,7 @@ func (x *StreamingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamingResponse.ProtoReflect.Descriptor instead.
 func (*StreamingResponse) Descriptor() ([]byte, []int) {
-	return file_objectweaver_proto_rawDescGZIP(), []int{11}
+	return file_objectweaver_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *StreamingResponse) GetData() *structpb.Struct {
@@ -904,7 +1411,7 @@ var File_objectweaver_proto protoreflect.FileDescriptor
 const file_objectweaver_proto_rawDesc = "" +
 	"\n" +
 	"\x12objectweaver.proto\x12\n" +
-	"jsonSchema\x1a\x19google/protobuf/any.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xc1\a\n" +
+	"jsonSchema\x1a\x19google/protobuf/any.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xb2\t\n" +
 	"\n" +
 	"Definition\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12 \n" +
@@ -930,7 +1437,11 @@ const file_objectweaver_proto_rawDesc = "" +
 	"\tsendImage\x18\x12 \x01(\v2\x15.jsonSchema.SendImageR\tsendImage\x12\x16\n" +
 	"\x06stream\x18\x13 \x01(\bR\x06stream\x12\x12\n" +
 	"\x04temp\x18\x14 \x01(\x02R\x04temp\x12\x1a\n" +
-	"\bpriority\x18\x15 \x01(\x05R\bpriority\x1aU\n" +
+	"\bpriority\x18\x15 \x01(\x05R\bpriority\x12&\n" +
+	"\x0eoverridePrompt\x18\x16 \x01(\tR\x0eoverridePrompt\x12?\n" +
+	"\rdecisionPoint\x18\x17 \x01(\v2\x19.jsonSchema.DecisionPointR\rdecisionPoint\x12E\n" +
+	"\x0fscoringCriteria\x18\x18 \x01(\v2\x1b.jsonSchema.ScoringCriteriaR\x0fscoringCriteria\x12?\n" +
+	"\rrecursiveLoop\x18\x19 \x01(\v2\x19.jsonSchema.RecursiveLoopR\rrecursiveLoop\x1aU\n" +
 	"\x0fPropertiesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
 	"\x05value\x18\x02 \x01(\v2\x16.jsonSchema.DefinitionR\x05value:\x028\x01\"x\n" +
@@ -974,7 +1485,49 @@ const file_objectweaver_proto_rawDesc = "" +
 	"\rrequireFields\x18\x06 \x03(\tR\rrequireFields\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"]\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xa6\x01\n" +
+	"\rDecisionPoint\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12*\n" +
+	"\x10evaluationPrompt\x18\x02 \x01(\tR\x10evaluationPrompt\x129\n" +
+	"\bbranches\x18\x03 \x03(\v2\x1d.jsonSchema.ConditionalBranchR\bbranches\x12\x1a\n" +
+	"\bstrategy\x18\x04 \x01(\tR\bstrategy\"\xd4\x01\n" +
+	"\x11ConditionalBranch\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x125\n" +
+	"\n" +
+	"conditions\x18\x02 \x03(\v2\x15.jsonSchema.ConditionR\n" +
+	"conditions\x12,\n" +
+	"\x05logic\x18\x03 \x01(\v2\x16.jsonSchema.DefinitionR\x05logic\x12*\n" +
+	"\x04then\x18\x04 \x01(\v2\x16.jsonSchema.DefinitionR\x04then\x12\x1a\n" +
+	"\bpriority\x18\x05 \x01(\x05R\bpriority\"\x8a\x01\n" +
+	"\tCondition\x12\x14\n" +
+	"\x05field\x18\x01 \x01(\tR\x05field\x12\x1a\n" +
+	"\boperator\x18\x02 \x01(\tR\boperator\x12-\n" +
+	"\x05value\x18\x03 \x01(\v2\x17.google.protobuf.StructR\x05value\x12\x1c\n" +
+	"\tfieldPath\x18\x04 \x01(\tR\tfieldPath\"\x93\x02\n" +
+	"\x0fScoringCriteria\x12K\n" +
+	"\n" +
+	"dimensions\x18\x01 \x03(\v2+.jsonSchema.ScoringCriteria.DimensionsEntryR\n" +
+	"dimensions\x12(\n" +
+	"\x0fevaluationModel\x18\x02 \x01(\tR\x0fevaluationModel\x12,\n" +
+	"\x11aggregationMethod\x18\x03 \x01(\tR\x11aggregationMethod\x1a[\n" +
+	"\x0fDimensionsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x122\n" +
+	"\x05value\x18\x02 \x01(\v2\x1c.jsonSchema.ScoringDimensionR\x05value:\x028\x01\"\x8e\x01\n" +
+	"\x10ScoringDimension\x12 \n" +
+	"\vdescription\x18\x01 \x01(\tR\vdescription\x12,\n" +
+	"\x05scale\x18\x02 \x01(\v2\x16.jsonSchema.ScoreScaleR\x05scale\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x16\n" +
+	"\x06weight\x18\x04 \x01(\x01R\x06weight\"0\n" +
+	"\n" +
+	"ScoreScale\x12\x10\n" +
+	"\x03min\x18\x01 \x01(\x05R\x03min\x12\x10\n" +
+	"\x03max\x18\x02 \x01(\x05R\x03max\"\xfc\x01\n" +
+	"\rRecursiveLoop\x12$\n" +
+	"\rmaxIterations\x18\x01 \x01(\x05R\rmaxIterations\x12\x1c\n" +
+	"\tselection\x18\x02 \x01(\tR\tselection\x12E\n" +
+	"\x10terminationPoint\x18\x03 \x01(\v2\x19.jsonSchema.DecisionPointR\x10terminationPoint\x12&\n" +
+	"\x0efeedbackPrompt\x18\x04 \x01(\tR\x0efeedbackPrompt\x128\n" +
+	"\x17includePreviousAttempts\x18\x05 \x01(\bR\x17includePreviousAttempts\"]\n" +
 	"\vRequestBody\x12\x16\n" +
 	"\x06prompt\x18\x01 \x01(\tR\x06prompt\x126\n" +
 	"\n" +
@@ -1003,7 +1556,7 @@ func file_objectweaver_proto_rawDescGZIP() []byte {
 	return file_objectweaver_proto_rawDescData
 }
 
-var file_objectweaver_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_objectweaver_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_objectweaver_proto_goTypes = []any{
 	(*Definition)(nil),        // 0: jsonSchema.Definition
 	(*TextToSpeech)(nil),      // 1: jsonSchema.TextToSpeech
@@ -1014,15 +1567,23 @@ var file_objectweaver_proto_goTypes = []any{
 	(*Focus)(nil),             // 6: jsonSchema.Focus
 	(*SendImage)(nil),         // 7: jsonSchema.SendImage
 	(*RequestFormat)(nil),     // 8: jsonSchema.RequestFormat
-	(*RequestBody)(nil),       // 9: jsonSchema.RequestBody
-	(*Response)(nil),          // 10: jsonSchema.Response
-	(*StreamingResponse)(nil), // 11: jsonSchema.StreamingResponse
-	nil,                       // 12: jsonSchema.Definition.PropertiesEntry
-	nil,                       // 13: jsonSchema.RequestFormat.HeadersEntry
-	(*structpb.Struct)(nil),   // 14: google.protobuf.Struct
+	(*DecisionPoint)(nil),     // 9: jsonSchema.DecisionPoint
+	(*ConditionalBranch)(nil), // 10: jsonSchema.ConditionalBranch
+	(*Condition)(nil),         // 11: jsonSchema.Condition
+	(*ScoringCriteria)(nil),   // 12: jsonSchema.ScoringCriteria
+	(*ScoringDimension)(nil),  // 13: jsonSchema.ScoringDimension
+	(*ScoreScale)(nil),        // 14: jsonSchema.ScoreScale
+	(*RecursiveLoop)(nil),     // 15: jsonSchema.RecursiveLoop
+	(*RequestBody)(nil),       // 16: jsonSchema.RequestBody
+	(*Response)(nil),          // 17: jsonSchema.Response
+	(*StreamingResponse)(nil), // 18: jsonSchema.StreamingResponse
+	nil,                       // 19: jsonSchema.Definition.PropertiesEntry
+	nil,                       // 20: jsonSchema.RequestFormat.HeadersEntry
+	nil,                       // 21: jsonSchema.ScoringCriteria.DimensionsEntry
+	(*structpb.Struct)(nil),   // 22: google.protobuf.Struct
 }
 var file_objectweaver_proto_depIdxs = []int32{
-	12, // 0: jsonSchema.Definition.properties:type_name -> jsonSchema.Definition.PropertiesEntry
+	19, // 0: jsonSchema.Definition.properties:type_name -> jsonSchema.Definition.PropertiesEntry
 	0,  // 1: jsonSchema.Definition.items:type_name -> jsonSchema.Definition
 	8,  // 2: jsonSchema.Definition.req:type_name -> jsonSchema.RequestFormat
 	6,  // 3: jsonSchema.Definition.narrowFocus:type_name -> jsonSchema.Focus
@@ -1032,22 +1593,34 @@ var file_objectweaver_proto_depIdxs = []int32{
 	2,  // 7: jsonSchema.Definition.speechToText:type_name -> jsonSchema.SpeechToText
 	3,  // 8: jsonSchema.Definition.image:type_name -> jsonSchema.Image
 	7,  // 9: jsonSchema.Definition.sendImage:type_name -> jsonSchema.SendImage
-	0,  // 10: jsonSchema.HashMap.fieldDefinition:type_name -> jsonSchema.Definition
-	13, // 11: jsonSchema.RequestFormat.headers:type_name -> jsonSchema.RequestFormat.HeadersEntry
-	14, // 12: jsonSchema.RequestFormat.body:type_name -> google.protobuf.Struct
-	0,  // 13: jsonSchema.RequestBody.definition:type_name -> jsonSchema.Definition
-	14, // 14: jsonSchema.Response.data:type_name -> google.protobuf.Struct
-	14, // 15: jsonSchema.StreamingResponse.data:type_name -> google.protobuf.Struct
-	0,  // 16: jsonSchema.Definition.PropertiesEntry.value:type_name -> jsonSchema.Definition
-	9,  // 17: jsonSchema.JSONSchemaService.GenerateObject:input_type -> jsonSchema.RequestBody
-	9,  // 18: jsonSchema.JSONSchemaService.StreamGeneratedObjects:input_type -> jsonSchema.RequestBody
-	10, // 19: jsonSchema.JSONSchemaService.GenerateObject:output_type -> jsonSchema.Response
-	11, // 20: jsonSchema.JSONSchemaService.StreamGeneratedObjects:output_type -> jsonSchema.StreamingResponse
-	19, // [19:21] is the sub-list for method output_type
-	17, // [17:19] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	9,  // 10: jsonSchema.Definition.decisionPoint:type_name -> jsonSchema.DecisionPoint
+	12, // 11: jsonSchema.Definition.scoringCriteria:type_name -> jsonSchema.ScoringCriteria
+	15, // 12: jsonSchema.Definition.recursiveLoop:type_name -> jsonSchema.RecursiveLoop
+	0,  // 13: jsonSchema.HashMap.fieldDefinition:type_name -> jsonSchema.Definition
+	20, // 14: jsonSchema.RequestFormat.headers:type_name -> jsonSchema.RequestFormat.HeadersEntry
+	22, // 15: jsonSchema.RequestFormat.body:type_name -> google.protobuf.Struct
+	10, // 16: jsonSchema.DecisionPoint.branches:type_name -> jsonSchema.ConditionalBranch
+	11, // 17: jsonSchema.ConditionalBranch.conditions:type_name -> jsonSchema.Condition
+	0,  // 18: jsonSchema.ConditionalBranch.logic:type_name -> jsonSchema.Definition
+	0,  // 19: jsonSchema.ConditionalBranch.then:type_name -> jsonSchema.Definition
+	22, // 20: jsonSchema.Condition.value:type_name -> google.protobuf.Struct
+	21, // 21: jsonSchema.ScoringCriteria.dimensions:type_name -> jsonSchema.ScoringCriteria.DimensionsEntry
+	14, // 22: jsonSchema.ScoringDimension.scale:type_name -> jsonSchema.ScoreScale
+	9,  // 23: jsonSchema.RecursiveLoop.terminationPoint:type_name -> jsonSchema.DecisionPoint
+	0,  // 24: jsonSchema.RequestBody.definition:type_name -> jsonSchema.Definition
+	22, // 25: jsonSchema.Response.data:type_name -> google.protobuf.Struct
+	22, // 26: jsonSchema.StreamingResponse.data:type_name -> google.protobuf.Struct
+	0,  // 27: jsonSchema.Definition.PropertiesEntry.value:type_name -> jsonSchema.Definition
+	13, // 28: jsonSchema.ScoringCriteria.DimensionsEntry.value:type_name -> jsonSchema.ScoringDimension
+	16, // 29: jsonSchema.JSONSchemaService.GenerateObject:input_type -> jsonSchema.RequestBody
+	16, // 30: jsonSchema.JSONSchemaService.StreamGeneratedObjects:input_type -> jsonSchema.RequestBody
+	17, // 31: jsonSchema.JSONSchemaService.GenerateObject:output_type -> jsonSchema.Response
+	18, // 32: jsonSchema.JSONSchemaService.StreamGeneratedObjects:output_type -> jsonSchema.StreamingResponse
+	31, // [31:33] is the sub-list for method output_type
+	29, // [29:31] is the sub-list for method input_type
+	29, // [29:29] is the sub-list for extension type_name
+	29, // [29:29] is the sub-list for extension extendee
+	0,  // [0:29] is the sub-list for field type_name
 }
 
 func init() { file_objectweaver_proto_init() }
@@ -1061,7 +1634,7 @@ func file_objectweaver_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_objectweaver_proto_rawDesc), len(file_objectweaver_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
