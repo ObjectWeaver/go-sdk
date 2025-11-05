@@ -10,7 +10,7 @@ func (d Definition) ToMap() map[string]interface{} {
 	if d.Instruction != "" {
 		result["instruction"] = d.Instruction
 	}
-	if d.Properties != nil && len(d.Properties) > 0 {
+	if len(d.Properties) > 0 {
 		propertiesMap := make(map[string]interface{})
 		for key, value := range d.Properties {
 			propertiesMap[key] = value.ToMap()

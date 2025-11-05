@@ -2,7 +2,7 @@ package converison
 
 import (
 	"fmt"
-	
+
 	pb "github.com/objectweaver/go-sdk/grpc"
 	"github.com/objectweaver/go-sdk/jsonSchema"
 )
@@ -14,30 +14,29 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 	}
 
 	modelDef := &jsonSchema.Definition{
-		Type:               jsonSchema.DataType(protoDef.Type),
-		Instruction:        protoDef.Instruction,
-		Properties:         make(map[string]jsonSchema.Definition),
-		Items:              ConvertProtoToModel(protoDef.GetItems()), // Use Getters to handle nil cases
-		Model:              protoDef.Model,
-		ProcessingOrder:    protoDef.ProcessingOrder,
-		SystemPrompt:       getStringPointer(protoDef.GetSystemPrompt()), // Safe getter for pointers
-		ImprovementProcess: protoDef.ImprovementProcess,
-		SelectFields:       protoDef.SelectFields,
-		Voters:             protoDef.Voters,
-		HashMap:            ConvertProtoToHashMap(protoDef.GetHashMap()),   // Check with Getters
-		NarrowFocus:        ConvertProtoToFocus(protoDef.GetNarrowFocus()), // Handle nil safely
-		Req:                ConvertProtoToRequestFormat(protoDef.GetReq()),
-		Choices:            ConvertProtoToChoices(protoDef.GetChoices()),
-		SpeechToText:       convertProtoSpeechToText(protoDef.GetSpeechToText()), // Safely handle nested structs
-		TextToSpeech:       convertProtoTextToSpeech(protoDef.GetTextToSpeech()),
-		SendImage:          convertProtoSendImage(protoDef.GetSendImage()), // Handle nil structs
-		Stream:             protoDef.Stream,
-		Temp:               float64(protoDef.Temp),
-		Priority:           protoDef.Priority,
-		OverridePrompt:     getStringPointer(protoDef.GetOverridePrompt()),
-		DecisionPoint:      convertProtoDecisionPoint(protoDef.GetDecisionPoint()),
-		ScoringCriteria:    convertProtoScoringCriteria(protoDef.GetScoringCriteria()),
-		RecursiveLoop:      convertProtoRecursiveLoop(protoDef.GetRecursiveLoop()),
+		Type:            jsonSchema.DataType(protoDef.Type),
+		Instruction:     protoDef.Instruction,
+		Properties:      make(map[string]jsonSchema.Definition),
+		Items:           ConvertProtoToModel(protoDef.GetItems()), // Use Getters to handle nil cases
+		Model:           protoDef.Model,
+		ProcessingOrder: protoDef.ProcessingOrder,
+		SystemPrompt:    getStringPointer(protoDef.GetSystemPrompt()), // Safe getter for pointers
+		SelectFields:    protoDef.SelectFields,
+		HashMap:         ConvertProtoToHashMap(protoDef.GetHashMap()),   // Check with Getters
+		NarrowFocus:     ConvertProtoToFocus(protoDef.GetNarrowFocus()), // Handle nil safely
+		Req:             ConvertProtoToRequestFormat(protoDef.GetReq()),
+		Choices:         ConvertProtoToChoices(protoDef.GetChoices()),
+		SpeechToText:    convertProtoSpeechToText(protoDef.GetSpeechToText()), // Safely handle nested structs
+		TextToSpeech:    convertProtoTextToSpeech(protoDef.GetTextToSpeech()),
+		SendImage:       convertProtoSendImage(protoDef.GetSendImage()), // Handle nil structs
+		Stream:          protoDef.Stream,
+		Temp:            float64(protoDef.Temp),
+		Priority:        protoDef.Priority,
+		OverridePrompt:  getStringPointer(protoDef.GetOverridePrompt()),
+		DecisionPoint:   convertProtoDecisionPoint(protoDef.GetDecisionPoint()),
+		ScoringCriteria: convertProtoScoringCriteria(protoDef.GetScoringCriteria()),
+		RecursiveLoop:   convertProtoRecursiveLoop(protoDef.GetRecursiveLoop()),
+		Epistemic:       convertProtoEpistemicValidation(protoDef.Epistemic),
 	}
 
 	// Handle Properties map
@@ -75,31 +74,30 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 	}
 
 	protoDef := &pb.Definition{
-		Type:               string(modelDef.Type),
-		Instruction:        modelDef.Instruction,
-		Properties:         make(map[string]*pb.Definition),
-		Items:              ConvertModelToProto(modelDef.Items),
-		Model:              modelDef.Model,
-		ProcessingOrder:    modelDef.ProcessingOrder,
-		SystemPrompt:       systemPrompt,
-		ImprovementProcess: modelDef.ImprovementProcess,
-		SelectFields:       modelDef.SelectFields,
-		Voters:             modelDef.Voters,
-		HashMap:            ConvertModelToProtoHashMap(modelDef.HashMap),
-		NarrowFocus:        ConvertModelToProtoFocus(modelDef.NarrowFocus),
-		Req:                ConvertModelToProtoRequestFormat(modelDef.Req),
-		Choices:            ConvertModelToProtoChoices(modelDef.Choices),
-		Image:              convertModelImage(modelDef.Image),
-		SpeechToText:       convertModelSpeechToText(modelDef.SpeechToText),
-		TextToSpeech:       convertModelTextToSpeech(modelDef.TextToSpeech),
-		SendImage:          convertModelSendImage(modelDef.SendImage),
-		Stream:             modelDef.Stream,
-		Temp:               float32(modelDef.Temp),
-		Priority:           modelDef.Priority,
-		OverridePrompt:     overridePrompt,
-		DecisionPoint:      convertModelDecisionPoint(modelDef.DecisionPoint),
-		ScoringCriteria:    convertModelScoringCriteria(modelDef.ScoringCriteria),
-		RecursiveLoop:      convertModelRecursiveLoop(modelDef.RecursiveLoop),
+		Type:            string(modelDef.Type),
+		Instruction:     modelDef.Instruction,
+		Properties:      make(map[string]*pb.Definition),
+		Items:           ConvertModelToProto(modelDef.Items),
+		Model:           modelDef.Model,
+		ProcessingOrder: modelDef.ProcessingOrder,
+		SystemPrompt:    systemPrompt,
+		SelectFields:    modelDef.SelectFields,
+		HashMap:         ConvertModelToProtoHashMap(modelDef.HashMap),
+		NarrowFocus:     ConvertModelToProtoFocus(modelDef.NarrowFocus),
+		Req:             ConvertModelToProtoRequestFormat(modelDef.Req),
+		Choices:         ConvertModelToProtoChoices(modelDef.Choices),
+		Image:           convertModelImage(modelDef.Image),
+		SpeechToText:    convertModelSpeechToText(modelDef.SpeechToText),
+		TextToSpeech:    convertModelTextToSpeech(modelDef.TextToSpeech),
+		SendImage:       convertModelSendImage(modelDef.SendImage),
+		Stream:          modelDef.Stream,
+		Temp:            float32(modelDef.Temp),
+		Priority:        modelDef.Priority,
+		OverridePrompt:  overridePrompt,
+		DecisionPoint:   convertModelDecisionPoint(modelDef.DecisionPoint),
+		ScoringCriteria: convertModelScoringCriteria(modelDef.ScoringCriteria),
+		RecursiveLoop:   convertModelRecursiveLoop(modelDef.RecursiveLoop),
+		Epistemic:       convertModelEpistemicValidation(&modelDef.Epistemic),
 	}
 
 	// Handle Properties map
@@ -440,5 +438,29 @@ func convertModelRecursiveLoop(rl *jsonSchema.RecursiveLoop) *pb.RecursiveLoop {
 		TerminationPoint:        convertModelDecisionPoint(rl.TerminationPoint),
 		FeedbackPrompt:          rl.FeedbackPrompt,
 		IncludePreviousAttempts: rl.IncludePreviousAttempts,
+	}
+}
+
+// Helper functions for EpistemicValidation
+
+func convertProtoEpistemicValidation(ev *pb.EpistemicValidation) jsonSchema.EpistemicValidation {
+	if ev == nil {
+		return jsonSchema.EpistemicValidation{}
+	}
+
+	return jsonSchema.EpistemicValidation{
+		Active: ev.Active,
+		Judges: int(ev.Judges),
+	}
+}
+
+func convertModelEpistemicValidation(ev *jsonSchema.EpistemicValidation) *pb.EpistemicValidation {
+	if ev == nil {
+		return nil
+	}
+
+	return &pb.EpistemicValidation{
+		Active: ev.Active,
+		Judges: int32(ev.Judges),
 	}
 }

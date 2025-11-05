@@ -3,26 +3,27 @@ package jsonSchema
 // Definition is a struct for describing a JSON Schema.
 // It is fairly limited, and you may have better luck using a third-party library.
 type Definition struct {
+
 	// Type specifies the data type of the schema.
 	Type DataType `json:"type,omitempty"`
+
 	// Instruction is the instruction for what to generate.
 	Instruction string `json:"instruction,omitempty"`
+
 	// Properties describes the properties of an object, if the schema type is Object.
 	Properties map[string]Definition `json:"properties"`
 
 	// Items specifies which data type an array contains, if the schema type is Array.
 	Items *Definition `json:"items,omitempty"`
+
 	// Model this needs to match the exact name of the model that you will be sending to AI as a Service provider. Such as OpenAI or Google Gemini
 	Model string `json:"model,omitempty"`
+
 	// ProcessingOrder this is the order of strings ie the fields of the parent property keys that need to be processed first before this field is processed
 	ProcessingOrder []string `json:"processingOrder,omitempty"`
 
 	// SystemPrompt allows the developer to spefificy their own system prompt so the processing. It operates current at the properties level.
 	SystemPrompt *string `json:"systemPrompt,omitempty"`
-	// Req allows a developer to send out a request at a given point to ensure that additional information can be extracted from external databases
-
-	// ImprovementProcess --> so that the user can specify when a super high quality completion is needed and it can be improved upon
-	ImprovementProcess bool `json:"improvementProcess,omitempty"`
 
 	//Map is used here as so that a map of values can be created and then returned -- useful in the instruction creation process -- not sure how useful it is otherwise
 	HashMap *HashMap
@@ -45,9 +46,6 @@ type Definition struct {
 
 	// Choices For determining which of the property fields should be generated
 	Choices *Choices `json:"choices,omitempty"`
-
-	// Voters this is used for determining whether you want to have voters determine the qulaity of completions. Increases costs but improves quality. If avialible to your tier then turned on automatically.
-	Voters bool `json:"voters,omitempty"`
 
 	//Image URL --> if the LLM supports reading an image due to it being multi-model then the image URL will be passed in here
 	SendImage *SendImage `json:"sendImage,omitempty"`
@@ -78,6 +76,14 @@ type Definition struct {
 	// The field will be regenerated multiple times, with each iteration scored and potentially improved.
 	// Useful for high-quality content that benefits from multiple attempts and selection of the best result.
 	RecursiveLoop *RecursiveLoop `json:"recursiveLoop,omitempty"`
+
+	// Epistemic indicates if the information being generated is epistemic in nature ie how valid is it
+	Epistemic EpistemicValidation `json:"epistemic,omitempty"`
+}
+
+type EpistemicValidation struct {
+	Active 	 bool     `json:"active,omitempty"`       //whether epistemic validation is active for this field
+	Judges int 	`json:"judges,omitempty"`       //number of judges to validate the information
 }
 
 type Choices struct {
