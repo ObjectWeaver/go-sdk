@@ -79,6 +79,8 @@ type Definition struct {
 
 	// Epistemic indicates if the information being generated is epistemic in nature ie how valid is it
 	Epistemic EpistemicValidation `json:"epistemic,omitempty"`
+
+	Seed int `json:"seed,omitempty"` //the seed value for randomization purposes
 }
 
 type EpistemicValidation struct {

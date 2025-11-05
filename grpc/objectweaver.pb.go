@@ -49,6 +49,7 @@ type Definition struct {
 	ScoringCriteria *ScoringCriteria       `protobuf:"bytes,22,opt,name=scoringCriteria,proto3" json:"scoringCriteria,omitempty"` // Corresponds to Go's ScoringCriteria field
 	RecursiveLoop   *RecursiveLoop         `protobuf:"bytes,23,opt,name=recursiveLoop,proto3" json:"recursiveLoop,omitempty"`     // Corresponds to Go's RecursiveLoop field
 	Epistemic       *EpistemicValidation   `protobuf:"bytes,24,opt,name=epistemic,proto3" json:"epistemic,omitempty"`             // Corresponds to Go's Epistemic field
+	Seed            int32                  `protobuf:"varint,25,opt,name=seed,proto3" json:"seed,omitempty"`                      // Corresponds to Go's Seed field
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -249,6 +250,13 @@ func (x *Definition) GetEpistemic() *EpistemicValidation {
 		return x.Epistemic
 	}
 	return nil
+}
+
+func (x *Definition) GetSeed() int32 {
+	if x != nil {
+		return x.Seed
+	}
+	return 0
 }
 
 // Audio message
@@ -1509,7 +1517,7 @@ var File_objectweaver_proto protoreflect.FileDescriptor
 const file_objectweaver_proto_rawDesc = "" +
 	"\n" +
 	"\x12objectweaver.proto\x12\n" +
-	"jsonSchema\x1a\x1cgoogle/protobuf/struct.proto\"\xa9\t\n" +
+	"jsonSchema\x1a\x1cgoogle/protobuf/struct.proto\"\xbd\t\n" +
 	"\n" +
 	"Definition\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12 \n" +
@@ -1538,7 +1546,8 @@ const file_objectweaver_proto_rawDesc = "" +
 	"\rdecisionPoint\x18\x15 \x01(\v2\x19.jsonSchema.DecisionPointR\rdecisionPoint\x12E\n" +
 	"\x0fscoringCriteria\x18\x16 \x01(\v2\x1b.jsonSchema.ScoringCriteriaR\x0fscoringCriteria\x12?\n" +
 	"\rrecursiveLoop\x18\x17 \x01(\v2\x19.jsonSchema.RecursiveLoopR\rrecursiveLoop\x12=\n" +
-	"\tepistemic\x18\x18 \x01(\v2\x1f.jsonSchema.EpistemicValidationR\tepistemic\x1aU\n" +
+	"\tepistemic\x18\x18 \x01(\v2\x1f.jsonSchema.EpistemicValidationR\tepistemic\x12\x12\n" +
+	"\x04seed\x18\x19 \x01(\x05R\x04seed\x1aU\n" +
 	"\x0fPropertiesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12,\n" +
 	"\x05value\x18\x02 \x01(\v2\x16.jsonSchema.DefinitionR\x05value:\x028\x01\"x\n" +

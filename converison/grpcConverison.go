@@ -37,6 +37,7 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		ScoringCriteria: convertProtoScoringCriteria(protoDef.GetScoringCriteria()),
 		RecursiveLoop:   convertProtoRecursiveLoop(protoDef.GetRecursiveLoop()),
 		Epistemic:       convertProtoEpistemicValidation(protoDef.Epistemic),
+		Seed:            int(protoDef.Seed),
 	}
 
 	// Handle Properties map
@@ -98,6 +99,7 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		ScoringCriteria: convertModelScoringCriteria(modelDef.ScoringCriteria),
 		RecursiveLoop:   convertModelRecursiveLoop(modelDef.RecursiveLoop),
 		Epistemic:       convertModelEpistemicValidation(&modelDef.Epistemic),
+		Seed:            int32(modelDef.Seed),
 	}
 
 	// Handle Properties map

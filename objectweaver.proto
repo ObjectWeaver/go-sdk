@@ -32,6 +32,7 @@ message Definition {
   ScoringCriteria scoringCriteria = 22; // Corresponds to Go's ScoringCriteria field
   RecursiveLoop recursiveLoop = 23; // Corresponds to Go's RecursiveLoop field
   EpistemicValidation epistemic = 24; // Corresponds to Go's Epistemic field
+  int32 seed = 25; // Corresponds to Go's Seed field
 }
 
 // Audio message
