@@ -37,7 +37,7 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		ScoringCriteria: convertProtoScoringCriteria(protoDef.GetScoringCriteria()),
 		RecursiveLoop:   convertProtoRecursiveLoop(protoDef.GetRecursiveLoop()),
 		Epistemic:       convertProtoEpistemicValidation(protoDef.Epistemic),
-		Seed:            int(protoDef.Seed),
+		Seed:            getIntPointer(protoDef.Seed),
 	}
 
 	// Handle Properties map
@@ -58,6 +58,15 @@ func getStringPointer(val string) *string {
 	return &val
 }
 
+// Helper function to safely get int pointers
+func getIntPointer(val int32) *int {
+	if val == 0 {
+		return nil
+	}
+	intVal := int(val)
+	return &intVal
+}
+
 // ConvertModelToProto converts your Go model Definition to a protobuf Definition
 func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 	if modelDef == nil {
@@ -72,6 +81,11 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 	overridePrompt := ""
 	if modelDef.OverridePrompt != nil {
 		overridePrompt = *modelDef.OverridePrompt
+	}
+
+	seed := int32(0)
+	if modelDef.Seed != nil {
+		seed = int32(*modelDef.Seed)
 	}
 
 	protoDef := &pb.Definition{
@@ -99,7 +113,7 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		ScoringCriteria: convertModelScoringCriteria(modelDef.ScoringCriteria),
 		RecursiveLoop:   convertModelRecursiveLoop(modelDef.RecursiveLoop),
 		Epistemic:       convertModelEpistemicValidation(&modelDef.Epistemic),
-		Seed:            int32(modelDef.Seed),
+		Seed:            seed,
 	}
 
 	// Handle Properties map
