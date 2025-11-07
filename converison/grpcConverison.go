@@ -28,6 +28,7 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		Req:             ConvertProtoToRequestFormat(protoDef.GetReq()),
 		SpeechToText:    convertProtoSpeechToText(protoDef.GetSpeechToText()), // Safely handle nested structs
 		TextToSpeech:    convertProtoTextToSpeech(protoDef.GetTextToSpeech()),
+		Image:           convertProtoImage(protoDef.GetImage()),         // Handle Image field
 		SendImage:       convertProtoSendImage(protoDef.GetSendImage()), // Handle nil structs
 		Stream:          protoDef.Stream,
 		Priority:        protoDef.Priority,
@@ -143,6 +144,16 @@ func convertProtoTextToSpeech(textToSpeech *pb.TextToSpeech) *jsonSchema.TextToS
 		Voice:         jsonSchema.Voice(textToSpeech.Voice),
 		StringToAudio: textToSpeech.StringToAudio,
 		Format:        jsonSchema.AudioFormat(textToSpeech.Format),
+	}
+}
+
+func convertProtoImage(image *pb.Image) *jsonSchema.Image {
+	if image == nil {
+		return nil
+	}
+	return &jsonSchema.Image{
+		Model: jsonSchema.ImageModel(image.Model),
+		Size:  jsonSchema.ImageSize(image.Size),
 	}
 }
 
