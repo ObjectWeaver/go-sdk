@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/objectweaver/go-sdk/grpc"
 	"github.com/objectweaver/go-sdk/jsonSchema"
+	"google.golang.org/protobuf/types/known/structpb"
 )
 
 // ConvertProtoToModel converts a protobuf Definition to your Go model Definition
@@ -25,19 +26,17 @@ func ConvertProtoToModel(protoDef *pb.Definition) *jsonSchema.Definition {
 		HashMap:         ConvertProtoToHashMap(protoDef.GetHashMap()),   // Check with Getters
 		NarrowFocus:     ConvertProtoToFocus(protoDef.GetNarrowFocus()), // Handle nil safely
 		Req:             ConvertProtoToRequestFormat(protoDef.GetReq()),
-		Choices:         ConvertProtoToChoices(protoDef.GetChoices()),
 		SpeechToText:    convertProtoSpeechToText(protoDef.GetSpeechToText()), // Safely handle nested structs
 		TextToSpeech:    convertProtoTextToSpeech(protoDef.GetTextToSpeech()),
 		SendImage:       convertProtoSendImage(protoDef.GetSendImage()), // Handle nil structs
 		Stream:          protoDef.Stream,
-		Temp:            float64(protoDef.Temp),
 		Priority:        protoDef.Priority,
 		OverridePrompt:  getStringPointer(protoDef.GetOverridePrompt()),
 		DecisionPoint:   convertProtoDecisionPoint(protoDef.GetDecisionPoint()),
 		ScoringCriteria: convertProtoScoringCriteria(protoDef.GetScoringCriteria()),
 		RecursiveLoop:   convertProtoRecursiveLoop(protoDef.GetRecursiveLoop()),
 		Epistemic:       convertProtoEpistemicValidation(protoDef.Epistemic),
-		Seed:            getIntPointer(protoDef.Seed),
+		ModelConfig:     convertProtoModelConfig(protoDef.GetModelConfig()),
 	}
 
 	// Handle Properties map
@@ -83,11 +82,6 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		overridePrompt = *modelDef.OverridePrompt
 	}
 
-	seed := int32(0)
-	if modelDef.Seed != nil {
-		seed = int32(*modelDef.Seed)
-	}
-
 	protoDef := &pb.Definition{
 		Type:            string(modelDef.Type),
 		Instruction:     modelDef.Instruction,
@@ -100,20 +94,18 @@ func ConvertModelToProto(modelDef *jsonSchema.Definition) *pb.Definition {
 		HashMap:         ConvertModelToProtoHashMap(modelDef.HashMap),
 		NarrowFocus:     ConvertModelToProtoFocus(modelDef.NarrowFocus),
 		Req:             ConvertModelToProtoRequestFormat(modelDef.Req),
-		Choices:         ConvertModelToProtoChoices(modelDef.Choices),
 		Image:           convertModelImage(modelDef.Image),
 		SpeechToText:    convertModelSpeechToText(modelDef.SpeechToText),
 		TextToSpeech:    convertModelTextToSpeech(modelDef.TextToSpeech),
 		SendImage:       convertModelSendImage(modelDef.SendImage),
 		Stream:          modelDef.Stream,
-		Temp:            float32(modelDef.Temp),
 		Priority:        modelDef.Priority,
 		OverridePrompt:  overridePrompt,
 		DecisionPoint:   convertModelDecisionPoint(modelDef.DecisionPoint),
 		ScoringCriteria: convertModelScoringCriteria(modelDef.ScoringCriteria),
 		RecursiveLoop:   convertModelRecursiveLoop(modelDef.RecursiveLoop),
 		Epistemic:       convertModelEpistemicValidation(&modelDef.Epistemic),
-		Seed:            seed,
+		ModelConfig:     convertModelModelConfig(modelDef.ModelConfig),
 	}
 
 	// Handle Properties map
@@ -478,5 +470,101 @@ func convertModelEpistemicValidation(ev *jsonSchema.EpistemicValidation) *pb.Epi
 	return &pb.EpistemicValidation{
 		Active: ev.Active,
 		Judges: int32(ev.Judges),
+	}
+}
+
+// Helper functions for ModelConfig
+
+func convertProtoModelConfig(mc *pb.ModelConfig) *jsonSchema.ModelConfig {
+	if mc == nil {
+		return nil
+	}
+
+	// Convert logit bias map from int32 to int
+	logitBias := make(map[string]int)
+	for k, v := range mc.LogitBias {
+		logitBias[k] = int(v)
+	}
+
+	// Convert seed from int32 to *int
+	var seed *int
+	if mc.Seed != 0 {
+		seedVal := int(mc.Seed)
+		seed = &seedVal
+	}
+
+	// Convert chatTemplateKwargs from protobuf Struct to map[string]any
+	var chatTemplateKwargs map[string]any
+	if mc.ChatTemplateKwargs != nil {
+		chatTemplateKwargs = mc.ChatTemplateKwargs.AsMap()
+	}
+
+	return &jsonSchema.ModelConfig{
+		MaxCompletionTokens: int(mc.MaxCompletionTokens),
+		Temperature:         mc.Temperature,
+		TopP:                mc.TopP,
+		N:                   int(mc.N),
+		Stream:              mc.Stream,
+		Stop:                mc.Stop,
+		PresencePenalty:     mc.PresencePenalty,
+		Seed:                seed,
+		FrequencyPenalty:    mc.FrequencyPenalty,
+		LogitBias:           logitBias,
+		LogProbs:            mc.LogProbs,
+		TopLogProbs:         int(mc.TopLogProbs),
+		User:                mc.User,
+		Store:               mc.Store,
+		ReasoningEffort:     mc.ReasoningEffort,
+		Metadata:            mc.Metadata,
+		ChatTemplateKwargs:  chatTemplateKwargs,
+	}
+}
+
+func convertModelModelConfig(mc *jsonSchema.ModelConfig) *pb.ModelConfig {
+	if mc == nil {
+		return nil
+	}
+
+	// Convert logit bias map from int to int32
+	logitBias := make(map[string]int32)
+	for k, v := range mc.LogitBias {
+		logitBias[k] = int32(v)
+	}
+
+	// Convert seed from *int to int32
+	seed := int32(0)
+	if mc.Seed != nil {
+		seed = int32(*mc.Seed)
+	}
+
+	// Convert chatTemplateKwargs from map[string]any to protobuf Struct
+	var chatTemplateKwargs *structpb.Struct
+	if mc.ChatTemplateKwargs != nil {
+		var err error
+		chatTemplateKwargs, err = structpb.NewStruct(mc.ChatTemplateKwargs)
+		if err != nil {
+			// If conversion fails, leave it as nil
+			chatTemplateKwargs = nil
+		}
+	}
+
+	return &pb.ModelConfig{
+		MaxCompletionTokens: int32(mc.MaxCompletionTokens),
+		Temperature:         mc.Temperature,
+		TopP:                mc.TopP,
+		N:                   int32(mc.N),
+		Stream:              mc.Stream,
+		Stop:                mc.Stop,
+		PresencePenalty:     mc.PresencePenalty,
+		Seed:                seed,
+		FrequencyPenalty:    mc.FrequencyPenalty,
+		LogitBias:           logitBias,
+		LogProbs:            mc.LogProbs,
+		TopLogProbs:         int32(mc.TopLogProbs),
+		User:                mc.User,
+		Store:               mc.Store,
+		ReasoningEffort:     mc.ReasoningEffort,
+		Metadata:            mc.Metadata,
+		ChatTemplateKwargs:  chatTemplateKwargs,
 	}
 }

@@ -44,17 +44,11 @@ type Definition struct {
 	//"cars.color" --> Would return the entire list of colours that have been generated so far
 	SelectFields []string `json:"selectFields,omitempty"`
 
-	// Choices For determining which of the property fields should be generated
-	Choices *Choices `json:"choices,omitempty"`
-
 	//Image URL --> if the LLM supports reading an image due to it being multi-model then the image URL will be passed in here
 	SendImage *SendImage `json:"sendImage,omitempty"`
 
 	//Stream - used for instructing when the information should be streamed. Please visit the documentation for more information for which types are supported.
 	Stream bool `json:"stream,omitempty"`
-
-	//Temp - used for passing in a temperature value for the prompt request
-	Temp float64 `json:"temp,omitempty"`
 
 	//OverridePrompt - used for overriding the prompt that is passed in
 	OverridePrompt *string `json:"overridePrompt,omitempty"`
@@ -80,7 +74,7 @@ type Definition struct {
 	// Epistemic indicates if the information being generated is epistemic in nature ie how valid is it
 	Epistemic EpistemicValidation `json:"epistemic,omitempty"`
 
-	Seed *int `json:"seed,omitempty"` //the seed value for randomization purposes
+	ModelConfig *ModelConfig `json:"modelConfig,omitempty"` //the model configuration for the LLM model being used
 }
 
 type EpistemicValidation struct {
@@ -88,16 +82,48 @@ type EpistemicValidation struct {
 	Judges int 	`json:"judges,omitempty"`       //number of judges to validate the information
 }
 
-type Choices struct {
-	Number  int      `json:"number,omitempty"`  //this denotes the number of choices that should be selected
-	Options []string `json:"options,omitempty"` //this is the list of fields that will be chosen from
-	/*
-		How this works is that it needs to be in a of definitions which match with the properties field. From the properties fields the choice of those keys will be selected
-		the information of what the overall object, the properties being selected along with the instruction and their type and the types that they contain if the object goes down further.
-		the prompt will also be pass in so that the agent can make the best decesion possible
+type ModelConfig struct {
 
-		Once the choices have been selected the choices that haven't been selected will be deleted from the remaining keys avialible in both the ordered and unordered keys.
-	*/
+	// MaxCompletionTokens An upper bound for the number of tokens that can be generated for a completion,
+	// including visible output tokens and reasoning tokens https://platform.openai.com/docs/guides/reasoning
+	MaxCompletionTokens int                           `json:"max_completion_tokens,omitempty"`
+	Temperature         float32                       `json:"temperature,omitempty"`
+	TopP                float32                       `json:"top_p,omitempty"`
+	N                   int                           `json:"n,omitempty"`
+	Stream              bool                          `json:"stream,omitempty"`
+	Stop                []string                      `json:"stop,omitempty"`
+	PresencePenalty     float32                       `json:"presence_penalty,omitempty"`
+	Seed                *int                          `json:"seed,omitempty"`
+	FrequencyPenalty    float32                       `json:"frequency_penalty,omitempty"`
+
+	// LogitBias is must be a token id string (specified by their token ID in the tokenizer), not a word string.
+	// incorrect: `"logit_bias":{"You": 6}`, correct: `"logit_bias":{"1639": 6}`
+	// refs: https://platform.openai.com/docs/api-reference/chat/create#chat/create-logit_bias
+	LogitBias map[string]int `json:"logit_bias,omitempty"`
+
+	// LogProbs indicates whether to return log probabilities of the output tokens or not.
+	// If true, returns the log probabilities of each output token returned in the content of message.
+	// This option is currently not available on the gpt-4-vision-preview model.
+	LogProbs bool `json:"logprobs,omitempty"`
+
+	// TopLogProbs is an integer between 0 and 5 specifying the number of most likely tokens to return at each
+	// token position, each with an associated log probability.
+	// logprobs must be set to true if this parameter is used.
+	TopLogProbs int    `json:"top_logprobs,omitempty"`
+	User        string `json:"user,omitempty"`
+
+	// Store can be set to true to store the output of this completion request for use in distillations and evals.
+	// https://platform.openai.com/docs/api-reference/chat/create#chat-create-store
+	Store bool `json:"store,omitempty"`
+	// Controls effort on reasoning for reasoning models. It can be set to "low", "medium", or "high".
+	ReasoningEffort string `json:"reasoning_effort,omitempty"`
+	// Metadata to store with the completion.
+	Metadata map[string]string `json:"metadata,omitempty"`
+	// ChatTemplateKwargs provides a way to add non-standard parameters to the request body.
+	// Additional kwargs to pass to the template renderer. Will be accessible by the chat template.
+	// Such as think mode for qwen3. "chat_template_kwargs": {"enable_thinking": false}
+	// https://qwen.readthedocs.io/en/latest/deployment/vllm.html#thinking-non-thinking-modes
+	ChatTemplateKwargs map[string]any `json:"chat_template_kwargs,omitempty"`
 }
 
 // HashMap this can output a map of values and so whilst it may take up a single field it could output many fields
