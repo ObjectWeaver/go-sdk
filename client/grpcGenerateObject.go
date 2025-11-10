@@ -51,8 +51,9 @@ func (c *Client) GrpcGenerateObject(prompt string, definition *pb.Definition) (*
 	data, err := converison.ConvertStructpbToMap(response.Data)
 
 	res := &Response{
-		Data:    data,
-		UsdCost: response.UsdCost,
+		Data:         data,
+		UsdCost:      response.UsdCost,
+		DetailedData: response.DetailedData,
 	}
 
 	return res, nil
