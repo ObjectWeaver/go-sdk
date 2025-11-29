@@ -126,12 +126,12 @@ func convertProtoSpeechToText(speechToText *pb.SpeechToText) *jsonSchema.SpeechT
 		return nil
 	}
 	return &jsonSchema.SpeechToText{
-		Model:             jsonSchema.SpeechToTextModel(speechToText.Model),
+		Model:             speechToText.Model,
 		AudioToTranscribe: speechToText.AudioToTranscribe,
 		Language:          speechToText.Language,
 		ToString:          speechToText.ToString,
 		ToCaptions:        speechToText.ToCaptions,
-		Format:            jsonSchema.AudioFormat(speechToText.Format),
+		Format:            speechToText.Format,
 	}
 }
 
@@ -140,10 +140,10 @@ func convertProtoTextToSpeech(textToSpeech *pb.TextToSpeech) *jsonSchema.TextToS
 		return nil
 	}
 	return &jsonSchema.TextToSpeech{
-		Model:         jsonSchema.TextToSpeechModel(textToSpeech.Model),
-		Voice:         jsonSchema.Voice(textToSpeech.Voice),
+		Model:         textToSpeech.Model,
+		Voice:         textToSpeech.Voice,
 		StringToAudio: textToSpeech.StringToAudio,
-		Format:        jsonSchema.AudioFormat(textToSpeech.Format),
+		Format:        textToSpeech.Format,
 	}
 }
 
@@ -152,8 +152,8 @@ func convertProtoImage(image *pb.Image) *jsonSchema.Image {
 		return nil
 	}
 	return &jsonSchema.Image{
-		Model: jsonSchema.ImageModel(image.Model),
-		Size:  jsonSchema.ImageSize(image.Size),
+		Model: image.Model,
+		Size:  image.Size,
 	}
 }
 

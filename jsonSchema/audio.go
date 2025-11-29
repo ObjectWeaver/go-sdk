@@ -1,48 +1,29 @@
 package jsonSchema
 
-// AudioModel constant types for the different auido models
-type TextToSpeechModel string
-
-const OpenAiTTS TextToSpeechModel = "tts"
-
 // TextToSpeech the DataType to use with this type is Byte
 type TextToSpeech struct {
-	Model         TextToSpeechModel `json:"model,omitempty"`
-	StringToAudio string            `json:"stringToAudio,omitempty"`
-	Voice         Voice             `json:"voice,omitempty"`
-	Format        AudioFormat       `json:"format,omitempty"`
+	Model         string `json:"model,omitempty"`
+	StringToAudio string `json:"stringToAudio,omitempty"`
+	Voice         string            `json:"voice,omitempty"`
+	Format        string            `json:"format,omitempty"`
 }
 
-type SpeechToTextModel string
+const Text = "text"
+const SRT = "srt"
+const VTT = "vtt"
+const JSON = "json"
+const VerboseJSON = "verbose-json"
 
-const OpenAiWhisper SpeechToTextModel = "OpenAiWhisper"
-const GroqWhisper SpeechToTextModel = "GroqWhisper"
-
-type AudioFormat string
-
-const Text AudioFormat = "text"
-const SRT AudioFormat = "srt"
-const VTT AudioFormat = "vtt"
-const JSON AudioFormat = "json"
-const VerboseJSON AudioFormat = "verbose-json"
-
-type Voice string
-
-const (
-	Alloy   Voice = "alloy"
-	Echo    Voice = "echo"
-	Fable   Voice = "fable"
-	Onyx    Voice = "onyx"
-	Nova    Voice = "nova"
-	Shimmer Voice = "shimmer"
-)
 
 // SpeechToText the DataType to use with this type is String
 type SpeechToText struct {
-	Model             SpeechToTextModel `json:"model,omitempty"`
+	Model             string `json:"model,omitempty"`
 	AudioToTranscribe []byte            `json:"audioToTranscribe,omitempty"`
 	Language          string            `json:"language,omitempty"` //must be in the format of ISO-639-1  will default to en (english)
-	Format            AudioFormat       `json:"format,omitempty"`
+	Format            string            `json:"format,omitempty"`
 	ToString          bool              `json:"toString,omitempty"`
 	ToCaptions        bool              `json:"toCaptions,omitempty"`
+	ChunkingStrategy  string            `json:"chunkingStrategy,omitempty"`
+	ExtraBody		map[string]any    `json:"extraBody,omitempty"`
+	
 }

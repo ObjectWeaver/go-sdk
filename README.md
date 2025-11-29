@@ -1,4 +1,11 @@
-# ObjectWeaver Go SDK
+<div align="center">
+
+# <span style="font-family: 'Roboto', sans-serif;">ObjectWeaver Go SDK</span>
+
+[![License](https://img.shields.io/badge/License-GNU-blue.svg)](https://github.com/ObjectWeaver/go-sdk/blob/main/LICENSE)
+[![Documentation](https://img.shields.io/badge/Docs-objectweaver.dev-orange.svg)](https://objectweaver.dev/docs)
+
+</div>
 
 This module provides a client implementation for sending JSON definitions via HTTP POST requests. It is designed to be simple and easy to integrate into your existing Go projects.
 
@@ -16,21 +23,6 @@ import (
 ```
 
 ## Guide: Using Go Client to Send JSON Definitions
-
-This guide demonstrates how to create a Go client that sends JSON definitions using HTTP POST requests.
-
-### Step 1: Define the Client Struct
-
-Start by defining a `Client` struct that will manage the API connection.
-
-```go
-type Client struct {
-	Password  string // APIKey is the authentication token for the API.
-	BaseURL string // BaseURL is the base endpoint for API requests.
-}
-```
-
-# Guide: Using Go Client to Send JSON Definitions
 
 This guide demonstrates how to create a Go client that sends JSON definitions using HTTP POST requests.
 
